@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Reports</title>
+    <meta name="description" content="HYDRO Admin - Report Management">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input-container {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+
+        .search-input-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 2.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .search-clear:hover {
+            background: var(--gray-light);
+            color: var(--text);
+        }
+
+        .filter-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            min-width: 150px;
+        }
+
+        .filter-input {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        .filter-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .results-count {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--gray-light);
+            background: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .filter-btn.primary {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .filter-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .page-subtitle {
+            color: var(--gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Reports Table */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reports-table th,
+        .reports-table td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+        }
+
+        .reports-table th {
+            background: var(--light);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reports-table tr {
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .reports-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .reports-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .report-id {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.in_progress {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .status-badge.resolved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-badge.urgent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-badge.low {
+            background: var(--gray-light);
+            color: var(--gray);
+        }
+
+        .priority-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-badge.high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-view {
+            padding: 0.4rem 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-light);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .pagination-btn:hover {
+            background: var(--light);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                padding-left: 1rem;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+
+            .reports-table {
+                font-size: 0.85rem;
+            }
+
+            .reports-table th,
+            .reports-table td {
+                padding: 0.7rem;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item active"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1 class="header-title">Incoming Reports Queue</h1>
+                <p class="page-subtitle">
+                    <i class="fas fa-sort-amount-up"></i>
+                    Auto Sorted By Urgency
+                </p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="search-input-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput"
+                        placeholder="Search by ID, building, issue...">
+                    <button class="search-clear" id="searchClear">&times;</button>
+                </div>
+                <div class="filter-field">
+                    <label class="filter-label" for="dateFrom">From</label>
+                    <input type="date" class="filter-input" id="dateFrom" title="From date">
+                </div>
+                <div class="filter-field">
+                    <label class="filter-label" for="dateTo">To</label>
+                    <input type="date" class="filter-input" id="dateTo" title="To date">
+                </div>
+                <select class="filter-select" id="departmentFilter">
+                    <option value="">All Departments</option>
+                </select>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+                <button type="button" class="filter-btn primary" id="applyFiltersBtn" title="Apply filters">
+                    <i class="fas fa-filter"></i> Apply
+                </button>
+                <button type="button" class="filter-btn" id="clearFiltersBtn" title="Clear filters">
+                    <i class="fas fa-eraser"></i> Clear
+                </button>
+                <span class="results-count" id="resultsCount"></span>
+            </div>
+
+            <!-- Reports Table -->
+            <div class="table-card">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Report ID</th>
+                            <th>Date Submitted</th>
+                            <th>Building/Dept</th>
+                            <th>Issue Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <!-- Reports will be loaded here -->
+                    </tbody>
+                </table>
+
+                <div class="empty-state hidden" id="emptyState">
+                    <i class="fas fa-file-alt"></i>
+                    <p>No reports found</p>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard, adminLogout } from '../js/admin-auth.js';
+        import { getAllReports, getLocations } from '../js/admin.js';
+        import { toIssueTypeLabel, toRiskLevelLabel, normalizeRiskLevel } from '../js/reports/reports-schema.js';
+        import { formatTimestampManila } from '../js/timezone.js';
+        import { logError, logWarn } from '../js/shared/logger.js';
+
+        const PAGE_SIZE = 25;
+        const MAX_RANGE_DAYS = 365;
+        const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000;
+
+        let currentReports = [];
+        let visibleReports = [];
+        let searchTimeout = null;
+        let currentPageIndex = 0;
+        let pageStartAfters = [null];
+        let pageHasMore = false;
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const dateFromInput = document.getElementById('dateFrom');
+        const dateToInput = document.getElementById('dateTo');
+        const departmentFilter = document.getElementById('departmentFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const resultsCount = document.getElementById('resultsCount');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        const pagination = document.getElementById('pagination');
+
+        function toManilaStartMs(dateOnly) {
+            const [y, m, d] = String(dateOnly || '').split('-').map((v) => Number(v));
+            return Date.UTC(y, (m || 1) - 1, d || 1, 0, 0, 0, 0) - MANILA_OFFSET_MS;
+        }
+
+        function toManilaEndMs(dateOnly) {
+            const [y, m, d] = String(dateOnly || '').split('-').map((v) => Number(v));
+            return Date.UTC(y, (m || 1) - 1, d || 1, 23, 59, 59, 999) - MANILA_OFFSET_MS;
+        }
+
+        function getActiveFilters() {
+            const startDate = String(dateFromInput.value || '').trim();
+            const endDate = String(dateToInput.value || '').trim();
+            const department = String(departmentFilter.value || '').trim();
+            const status = String(statusFilter.value || '').trim();
+            return { startDate, endDate, department, status };
+        }
+
+        function validateDateRange(startDate, endDate) {
+            if (!startDate && !endDate) return { ok: true };
+            if (startDate && !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return { ok: false, error: 'Start date is invalid.' };
+            if (endDate && !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) return { ok: false, error: 'End date is invalid.' };
+            if (startDate && endDate) {
+                const startMs = toManilaStartMs(startDate);
+                const endMs = toManilaEndMs(endDate);
+                if (startMs > endMs) return { ok: false, error: 'Start date must be before or equal to end date.' };
+                const days = Math.ceil((endMs - startMs + 1) / (24 * 60 * 60 * 1000));
+                if (days > MAX_RANGE_DAYS) return { ok: false, error: `Date range must be ${MAX_RANGE_DAYS} days or fewer.` };
+            }
+            return { ok: true };
+        }
+
+        function setFilterError(message) {
+            if (!resultsCount) return;
+            resultsCount.textContent = message;
+            resultsCount.style.color = '#b91c1c';
+        }
+
+        function clearFilterError() {
+            if (!resultsCount) return;
+            resultsCount.style.color = '';
+        }
+
+        function applySearchFilter() {
+            const term = String(searchInput.value || '').toLowerCase().trim();
+            if (!term) {
+                visibleReports = [...currentReports];
+                return;
+            }
+
+            visibleReports = currentReports.filter((report) => {
+                const searchableText = [
+                    report.id,
+                    report.building,
+                    report.floor,
+                    report.issueType,
+                    toIssueTypeLabel(report.issueType || ''),
+                    report.description,
+                    report.location,
+                    report.status,
+                ]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+                return searchableText.includes(term);
+            });
+        }
+
+        function updatePagination() {
+            if (!pagination) return;
+            const prevDisabled = currentPageIndex <= 0;
+            const nextDisabled = !pageHasMore;
+            pagination.innerHTML = `
+                <button class="filter-btn" id="prevPageBtn" ${prevDisabled ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Prev</button>
+                <span style="color: var(--gray); font-size: 0.9rem;">Page ${currentPageIndex + 1}</span>
+                <button class="filter-btn" id="nextPageBtn" ${nextDisabled ? 'disabled' : ''}>Next <i class="fas fa-chevron-right"></i></button>
+            `;
+
+            const prevBtn = document.getElementById('prevPageBtn');
+            const nextBtn = document.getElementById('nextPageBtn');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentPageIndex <= 0) return;
+                    currentPageIndex -= 1;
+                    loadPage(currentPageIndex).catch(() => {});
+                });
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    if (!pageHasMore) return;
+                    currentPageIndex += 1;
+                    loadPage(currentPageIndex).catch(() => {});
+                });
+            }
+        }
+
+        async function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            try {
+                await initAdminAuthGuard();
+                await populateDepartmentFilter();
+                await applyFilters();
+            } catch (error) {
+                logError('Init error:', error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        async function populateDepartmentFilter() {
+            try {
+                const buildings = await getLocations();
+                const sorted = Array.isArray(buildings) ? buildings.map((b) => String(b || '').trim()).filter(Boolean).sort() : [];
+                departmentFilter.innerHTML = '<option value="">All Departments</option>' +
+                    sorted.map((d) => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            } catch (error) {
+                logWarn('Unable to load locations list:', error);
+                departmentFilter.innerHTML = '<option value="">All Departments</option>';
+            }
+        }
+
+        async function loadPage(pageIndex) {
+            clearFilterError();
+            const { startDate, endDate, department, status } = getActiveFilters();
+            const startAfter = pageStartAfters[pageIndex] || null;
+
+            const options = {
+                limit: PAGE_SIZE,
+                startAfter: startAfter || undefined,
+                department: department || undefined,
+                status: status || undefined,
+                startDate: startDate || undefined,
+                endDate: endDate || undefined,
+            };
+
+            const result = await getAllReports(options);
+            currentReports = Array.isArray(result.reports) ? result.reports : [];
+            pageHasMore = Boolean(result.lastDoc) && currentReports.length === PAGE_SIZE;
+            if (pageHasMore) {
+                pageStartAfters[pageIndex + 1] = result.lastDoc;
+            } else {
+                pageStartAfters = pageStartAfters.slice(0, pageIndex + 1);
+            }
+
+            applySearchFilter();
+            renderReports(visibleReports);
+            updateResultsCount();
+            updatePagination();
+        }
+
+        async function applyFilters() {
+            const { startDate, endDate } = getActiveFilters();
+            const validation = validateDateRange(startDate, endDate);
+            if (!validation.ok) {
+                setFilterError(validation.error);
+                return;
+            }
+            currentPageIndex = 0;
+            pageStartAfters = [null];
+            await loadPage(0);
+        }
+
+        function updateResultsCount() {
+            if (!resultsCount) return;
+            const showing = visibleReports.length;
+            const hasFilters = Boolean(dateFromInput.value || dateToInput.value || departmentFilter.value || statusFilter.value);
+            const hasSearch = Boolean(String(searchInput.value || '').trim());
+            const parts = [];
+            parts.push(`Showing ${showing} report${showing === 1 ? '' : 's'}`);
+            if (hasFilters || hasSearch) parts.push('(filtered)');
+            resultsCount.textContent = parts.join(' ');
+        }
+
+        function setEmptyState(isVisible) {
+            const emptyState = document.getElementById('emptyState');
+            if (!emptyState) return;
+            emptyState.classList.toggle('hidden', !isVisible);
+        }
+
+        function renderReports(reports) {
+            const tbody = document.getElementById('reportsTableBody');
+
+            if (!reports.length) {
+                tbody.innerHTML = '';
+                setEmptyState(true);
+                const emptyState = document.getElementById('emptyState');
+                const filters = getActiveFilters();
+                const inRange = Boolean(filters.startDate || filters.endDate);
+                if (emptyState) {
+                    const message = emptyState.querySelector('p');
+                    if (message) {
+                        message.textContent = inRange ? 'No results in selected range' : 'No reports found';
+                    }
+                }
+                return;
+            }
+
+            tbody.innerHTML = reports.map(report => {
+                const dateValue = report.createdAt?.toDate?.()
+                    ? report.createdAt.toDate()
+                    : new Date(report.createdAt?.seconds * 1000 || Date.now());
+                const date = formatTimestampManila(dateValue, { hour: undefined, minute: undefined });
+                const issueLabel = report.issueType ? toIssueTypeLabel(report.issueType) : 'N/A';
+                const riskValue = normalizeRiskLevel(report.riskLevel || 'low');
+                const riskLabel = toRiskLevelLabel(riskValue);
+                const riskClass = ['low', 'medium', 'high', 'urgent'].includes(riskValue) ? riskValue : 'low';
+
+                return `
+                    <tr>
+                        <td class="report-id">#${escapeHtml(report.id.substring(0, 8).toUpperCase())}</td>
+                        <td>${date}</td>
+                        <td>${escapeHtml((report.building ? `${report.building}${report.floor ? `, ${report.floor}` : ''}` : 'N/A'))}</td>
+                        <td>${escapeHtml(issueLabel || 'N/A')}</td>
+                        <td><span class="priority-badge ${riskClass}">${escapeHtml(riskLabel)}</span></td>
+                        <td><span class="status-badge ${report.status || 'pending'}">${(report.status || 'pending').replace('_', ' ')}</span></td>
+                        <td><a href="report-details.html?id=${report.id}" class="btn-view">View Details</a></td>
+                    </tr>
+                `;
+            }).join('');
+
+            setEmptyState(false);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Event handlers
+        searchInput.addEventListener('input', () => {
+            searchClear.style.display = searchInput.value ? 'block' : 'none';
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applySearchFilter();
+                renderReports(visibleReports);
+                updateResultsCount();
+            }, 300);
+        });
+
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            applySearchFilter();
+            renderReports(visibleReports);
+            updateResultsCount();
+        });
+
+        applyFiltersBtn.addEventListener('click', () => {
+            applyFiltersBtn.disabled = true;
+            applyFilters().catch((error) => {
+                logError('Apply filters failed:', error);
+                setFilterError(String(error?.message || 'Unable to apply filters.'));
+            }).finally(() => {
+                applyFiltersBtn.disabled = false;
+            });
+        });
+
+        clearFiltersBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            dateFromInput.value = '';
+            dateToInput.value = '';
+            departmentFilter.value = '';
+            statusFilter.value = '';
+            clearFilterError();
+            applyFiltersBtn.click();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+

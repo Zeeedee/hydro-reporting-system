@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "YOUR_PROJECT_ID"
+  },
+  "targets": {
+    "YOUR_PROJECT_ID": {
+      "hosting": {
+        "YOUR_HOSTING_TARGET": ["YOUR_HOSTING_SITE"]
+      }
+    }
+  }
+}

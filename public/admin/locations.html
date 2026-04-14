@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Locations</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        .page-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .location-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .location-card-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .location-card-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .btn-add-item {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-add-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-add-item.delete {
+            background: rgba(220, 38, 38, 0.25);
+        }
+
+        .btn-add-item.delete:hover {
+            background: rgba(220, 38, 38, 0.35);
+        }
+
+        .location-card-body {
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .location-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: var(--light);
+        }
+
+        .location-item:hover {
+            background: var(--gray-light);
+        }
+
+        .location-item-name {
+            font-size: 0.9rem;
+        }
+
+        .location-item-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 4px 6px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .btn-icon:hover {
+            background: var(--gray-light);
+        }
+
+        .btn-icon.delete {
+            color: var(--red);
+        }
+
+        .btn-icon.toggle {
+            color: var(--green);
+        }
+
+        .btn-icon.toggle.inactive {
+            color: var(--gray);
+        }
+
+        .add-form {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--light);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .add-form.hidden {
+            display: none;
+        }
+
+        .add-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .btn-add {
+            padding: 0.5rem 1rem;
+            background: var(--cyan);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            background: #0891b2;
+        }
+
+        .empty-text {
+            color: var(--gray);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        /* Add Building Button */
+        .btn-add-building {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-add-building:hover {
+            background: var(--primary-dark);
+        }
+
+        .error-banner {
+            display: none;
+            margin: 0 0 1rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .error-banner.is-visible {
+            display: block;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            z-index: 2000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 520px;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            border: none;
+            background: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+        }
+
+        .modal-body {
+            padding: 1.1rem 1.25rem;
+        }
+
+        .modal-body p {
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+            line-height: 1.45;
+        }
+
+        .modal-actions {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.65rem;
+        }
+
+        .modal-actions button {
+            height: 44px;
+            min-width: 120px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Prevent page-level Add Building button styles from affecting modal actions. */
+        .modal-actions .btn-add-building {
+            margin: 0;
+            padding: 0.75rem 1.1rem;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: var(--gray-light);
+            color: var(--text);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.1rem;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-danger:disabled,
+        .btn-add-building:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.85rem 0.95rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+        }
+
+        .modal-error {
+            display: none;
+            margin-top: 0.75rem;
+            color: #991b1b;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 0.65rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .modal-error.is-visible {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .locations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        @keyframes loadingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item active"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1 class="header-title">Location Setup</h1>
+                <p class="header-subtitle">Manage buildings and floors for student reports</p>
+            </div>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div id="locationsErrorBanner" class="error-banner"></div>
+            <p class="page-description">
+                Configure buildings and floors that students can select when submitting water issue reports.
+                Students will still type the specific location (room/landmark) on the submission form.
+            </p>
+
+            <button class="btn-add-building" id="addBuildingBtn">
+                <i class="fas fa-plus"></i> Add Building
+            </button>
+
+            <div class="locations-grid" id="locationsGrid">
+                <!-- Location cards will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay hidden" id="addLocationModal" role="dialog" aria-modal="true" aria-labelledby="addLocationTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="addLocationTitle">Add Building</div>
+                <button type="button" class="modal-close" data-modal-close aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Enter the building name (2-80 characters).</p>
+                <input class="modal-input" id="addLocationName" type="text" maxlength="80" placeholder="e.g. Building A" autocomplete="off" />
+                <div class="modal-error" id="addLocationError"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" data-modal-cancel>Cancel</button>
+                <button type="button" class="btn-add-building" id="confirmAddLocationBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="addFloorModal" role="dialog" aria-modal="true" aria-labelledby="addFloorTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="addFloorTitle">Add Floor</div>
+                <button type="button" class="modal-close" data-floor-close aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="addFloorBuildingLabel">Building: --</p>
+                <input class="modal-input" id="addFloorName" type="text" maxlength="60" placeholder="e.g. Floor 2 or 2F" autocomplete="off" />
+                <div class="modal-error" id="addFloorError"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" data-floor-cancel>Cancel</button>
+                <button type="button" class="btn-add-building" id="confirmAddFloorBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="deleteLocationModal" role="dialog" aria-modal="true" aria-labelledby="deleteLocationTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="deleteLocationTitle">Delete</div>
+                <button type="button" class="modal-close" data-delete-close aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteLocationPrompt">This action cannot be undone. Type DELETE to confirm.</p>
+                <input class="modal-input" id="deleteConfirmInput" type="text" placeholder="Type DELETE" autocomplete="off" />
+                <div class="modal-error" id="deleteLocationError"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" data-delete-cancel>Cancel</button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn" disabled>Delete</button>
+            </div>
+        </div>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard, adminLogout } from '../js/admin-auth.js';
+        import { createLocation, createFloor, deleteFloor, deleteLocation } from '../js/admin.js';
+        import { db } from '../js/firebase-config.js';
+        import { collection, getDocs, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { validateSafeName } from '../js/validation/validation.js';
+        import { COLLECTIONS } from '../js/config/app-constants.js';
+        import { logError } from '../js/shared/logger.js';
+
+        let buildingEntries = [];
+        let pendingDelete = null; // { kind: 'building'|'floor', id, label }
+        let pendingFloorBuilding = null; // { id, name }
+
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const grid = document.getElementById('locationsGrid');
+        const errorBanner = document.getElementById('locationsErrorBanner');
+
+        const addBuildingModal = document.getElementById('addLocationModal');
+        const addBuildingInput = document.getElementById('addLocationName');
+        const addBuildingError = document.getElementById('addLocationError');
+        const addBuildingConfirmBtn = document.getElementById('confirmAddLocationBtn');
+
+        const addFloorModal = document.getElementById('addFloorModal');
+        const addFloorLabel = document.getElementById('addFloorBuildingLabel');
+        const addFloorInput = document.getElementById('addFloorName');
+        const addFloorError = document.getElementById('addFloorError');
+        const addFloorConfirmBtn = document.getElementById('confirmAddFloorBtn');
+
+        const deleteModal = document.getElementById('deleteLocationModal');
+        const deleteTitle = document.getElementById('deleteLocationTitle');
+        const deletePrompt = document.getElementById('deleteLocationPrompt');
+        const deleteInput = document.getElementById('deleteConfirmInput');
+        const deleteError = document.getElementById('deleteLocationError');
+        const deleteConfirmBtn = document.getElementById('confirmDeleteBtn');
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        function setBanner(message = '') {
+            if (!errorBanner) return;
+            errorBanner.textContent = message;
+            errorBanner.classList.toggle('is-visible', Boolean(message));
+        }
+
+        function showModalError(el, message = '') {
+            if (!el) return;
+            el.textContent = message;
+            el.classList.toggle('is-visible', Boolean(message));
+        }
+
+        function openAddBuildingModal() {
+            showModalError(addBuildingError, '');
+            setBanner('');
+            if (addBuildingInput) addBuildingInput.value = '';
+            if (addBuildingModal) addBuildingModal.classList.remove('hidden');
+            addBuildingInput?.focus();
+        }
+
+        function closeAddBuildingModal() {
+            addBuildingModal?.classList.add('hidden');
+        }
+
+        function openAddFloorModalForBuilding(buildingId, buildingName) {
+            pendingFloorBuilding = { id: buildingId, name: buildingName };
+            showModalError(addFloorError, '');
+            if (addFloorLabel) {
+                addFloorLabel.textContent = `Building: ${buildingName}`;
+            }
+            if (addFloorInput) addFloorInput.value = '';
+            addFloorModal?.classList.remove('hidden');
+            addFloorInput?.focus();
+        }
+
+        function closeAddFloorModal() {
+            pendingFloorBuilding = null;
+            addFloorModal?.classList.add('hidden');
+        }
+
+        function openDeleteModal(kind, id, label) {
+            pendingDelete = { kind, id, label };
+            if (deleteTitle) {
+                deleteTitle.textContent = kind === 'floor' ? 'Delete Floor' : 'Delete Building';
+            }
+            if (deletePrompt) {
+                deletePrompt.textContent = `Delete "${label}". This action cannot be undone. Type DELETE to confirm.`;
+            }
+            if (deleteInput) deleteInput.value = '';
+            if (deleteConfirmBtn) deleteConfirmBtn.disabled = true;
+            showModalError(deleteError, '');
+            deleteModal?.classList.remove('hidden');
+            deleteInput?.focus();
+        }
+
+        function closeDeleteModal() {
+            pendingDelete = null;
+            deleteModal?.classList.add('hidden');
+        }
+
+        function sortByLabel(a, b) {
+            return String(a || '').localeCompare(String(b || ''), undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        function renderLocations() {
+            if (!grid) return;
+
+            if (!buildingEntries.length) {
+                grid.innerHTML = '<p class="empty-text" style="grid-column:1/-1;">No buildings configured. Click "Add Building" to get started.</p>';
+                return;
+            }
+
+            grid.innerHTML = buildingEntries.map((entry) => {
+                const buildingName = escapeHtml(entry.building);
+                const floorsHtml = entry.floors.length
+                    ? entry.floors
+                        .sort((a, b) => sortByLabel(a.floor, b.floor))
+                        .map((floor) => {
+                            return `
+                                <div class="location-item">
+                                    <span class="location-item-name">${escapeHtml(floor.floor)}</span>
+                                    <div class="location-item-actions">
+                                        <button type="button" class="btn-icon delete" data-delete-floor="${floor.id}" data-floor-label="${escapeHtml(floor.floor)}" data-building-label="${buildingName}" title="Delete Floor">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')
+                    : '<p class="empty-text">No floors yet. Click + to add.</p>';
+
+                const buildingId = entry.id ? escapeHtml(entry.id) : '';
+                const buildingDisabled = entry.id ? '' : 'disabled';
+
+                return `
+                    <div class="location-card">
+                        <div class="location-card-header">
+                            <span class="location-card-title">${buildingName}</span>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <button type="button" class="btn-add-item" data-add-floor="${buildingId}" data-building-name="${buildingName}" title="Add Floor" ${buildingDisabled}>
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn-add-item delete" data-delete-building="${buildingId}" data-building-name="${buildingName}" title="Delete Building" ${buildingDisabled}>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="location-card-body">
+                            ${floorsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            grid.querySelectorAll('[data-add-floor]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const buildingId = btn.getAttribute('data-add-floor');
+                    const name = btn.getAttribute('data-building-name') || '';
+                    if (!buildingId) return;
+                    openAddFloorModalForBuilding(buildingId, name);
+                });
+            });
+
+            grid.querySelectorAll('[data-delete-building]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const buildingId = btn.getAttribute('data-delete-building');
+                    const name = btn.getAttribute('data-building-name') || '';
+                    if (!buildingId) return;
+                    openDeleteModal('building', buildingId, name);
+                });
+            });
+
+            grid.querySelectorAll('[data-delete-floor]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const floorId = btn.getAttribute('data-delete-floor');
+                    const floorLabel = btn.getAttribute('data-floor-label') || '';
+                    const buildingLabel = btn.getAttribute('data-building-label') || '';
+                    if (!floorId) return;
+                    openDeleteModal('floor', floorId, `${buildingLabel} - ${floorLabel}`);
+                });
+            });
+        }
+
+        async function loadLocations() {
+            setBanner('');
+            if (!grid) return;
+
+            try {
+                const snapshot = await getDocs(query(collection(db, COLLECTIONS.LOCATIONS), orderBy('building')));
+                const rawDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() || {}) }));
+
+                const map = new Map();
+                rawDocs.forEach((item) => {
+                    if (item.active === false) return;
+                    const building = String(item.building || '').trim();
+                    const floor = String(item.floor || '').trim();
+                    const area = String(item.area || '').trim();
+                    if (!building) return;
+                    if (area) return;
+
+                    if (!map.has(building)) {
+                        map.set(building, { building, id: null, floors: [] });
+                    }
+
+                    if (!floor) {
+                        map.get(building).id = item.id;
+                    } else {
+                        map.get(building).floors.push({ id: item.id, floor });
+                    }
+                });
+
+                buildingEntries = Array.from(map.values()).sort((a, b) => sortByLabel(a.building, b.building));
+                renderLocations();
+            } catch (error) {
+                logError('Error loading locations:', error);
+                setBanner('Unable to load locations. Check connection / browser shields and try again.');
+                grid.innerHTML = '<p class="empty-text" style="grid-column:1/-1;">Unable to load locations right now.</p>';
+            }
+        }
+
+        function setupEventListeners() {
+            const addBuildingBtn = document.getElementById('addBuildingBtn');
+            addBuildingBtn?.addEventListener('click', () => openAddBuildingModal());
+
+            addBuildingModal?.addEventListener('click', (event) => {
+                if (event.target === addBuildingModal) closeAddBuildingModal();
+            });
+
+            document.querySelectorAll('[data-modal-close], [data-modal-cancel]').forEach((btn) => {
+                btn.addEventListener('click', () => closeAddBuildingModal());
+            });
+
+            addBuildingConfirmBtn?.addEventListener('click', async () => {
+                showModalError(addBuildingError, '');
+                const rawName = addBuildingInput ? addBuildingInput.value : '';
+                const nameCheck = validateSafeName(rawName, { min: 2, max: 80, label: 'Building' });
+                if (!nameCheck.valid) {
+                    showModalError(addBuildingError, nameCheck.error);
+                    return;
+                }
+
+                try {
+                    addBuildingConfirmBtn.disabled = true;
+                    await createLocation(nameCheck.value);
+                    closeAddBuildingModal();
+                    await loadLocations();
+                } catch (error) {
+                    logError('Error adding building:', error);
+                    showModalError(addBuildingError, error?.message || 'Failed to add building.');
+                } finally {
+                    addBuildingConfirmBtn.disabled = false;
+                }
+            });
+
+            addBuildingInput?.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    addBuildingConfirmBtn?.click();
+                }
+                if (event.key === 'Escape') {
+                    closeAddBuildingModal();
+                }
+            });
+
+            addFloorModal?.addEventListener('click', (event) => {
+                if (event.target === addFloorModal) closeAddFloorModal();
+            });
+
+            document.querySelectorAll('[data-floor-close], [data-floor-cancel]').forEach((btn) => {
+                btn.addEventListener('click', () => closeAddFloorModal());
+            });
+
+            addFloorConfirmBtn?.addEventListener('click', async () => {
+                showModalError(addFloorError, '');
+                const rawFloor = addFloorInput ? addFloorInput.value : '';
+                const floorCheck = validateSafeName(rawFloor, { min: 1, max: 60, label: 'Floor' });
+                if (!floorCheck.valid) {
+                    showModalError(addFloorError, floorCheck.error);
+                    return;
+                }
+                if (!pendingFloorBuilding?.id) {
+                    showModalError(addFloorError, 'Missing building context.');
+                    return;
+                }
+
+                try {
+                    addFloorConfirmBtn.disabled = true;
+                    await createFloor(pendingFloorBuilding.id, floorCheck.value);
+                    closeAddFloorModal();
+                    await loadLocations();
+                } catch (error) {
+                    logError('Error adding floor:', error);
+                    showModalError(addFloorError, error?.message || 'Failed to add floor.');
+                } finally {
+                    addFloorConfirmBtn.disabled = false;
+                }
+            });
+
+            addFloorInput?.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    addFloorConfirmBtn?.click();
+                }
+                if (event.key === 'Escape') {
+                    closeAddFloorModal();
+                }
+            });
+
+            deleteModal?.addEventListener('click', (event) => {
+                if (event.target === deleteModal) closeDeleteModal();
+            });
+
+            document.querySelectorAll('[data-delete-close], [data-delete-cancel]').forEach((btn) => {
+                btn.addEventListener('click', () => closeDeleteModal());
+            });
+
+            deleteInput?.addEventListener('input', () => {
+                const ok = String(deleteInput.value || '').trim().toUpperCase() === 'DELETE';
+                if (deleteConfirmBtn) deleteConfirmBtn.disabled = !ok;
+            });
+
+            deleteInput?.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeDeleteModal();
+            });
+
+            deleteConfirmBtn?.addEventListener('click', async () => {
+                showModalError(deleteError, '');
+                if (!pendingDelete?.id || !pendingDelete?.kind) {
+                    showModalError(deleteError, 'No item selected.');
+                    return;
+                }
+                if (String(deleteInput?.value || '').trim().toUpperCase() !== 'DELETE') {
+                    showModalError(deleteError, 'Type DELETE to confirm.');
+                    return;
+                }
+
+                try {
+                    deleteConfirmBtn.disabled = true;
+                    if (pendingDelete.kind === 'floor') {
+                        await deleteFloor(pendingDelete.id);
+                    } else {
+                        await deleteLocation(pendingDelete.id);
+                    }
+                    closeDeleteModal();
+                    await loadLocations();
+                } catch (error) {
+                    logError('Error deleting item:', error);
+                    showModalError(deleteError, error?.message || 'Failed to delete item.');
+                } finally {
+                    const ok = String(deleteInput?.value || '').trim().toUpperCase() === 'DELETE';
+                    deleteConfirmBtn.disabled = !ok;
+                }
+            });
+
+            document.getElementById('logoutBtn')?.addEventListener('click', adminLogout);
+        }
+
+        async function init() {
+            try {
+                await initAdminAuthGuard();
+                setupEventListeners();
+                await loadLocations();
+            } catch (error) {
+                logError('Init error:', error);
+                setBanner(error?.message || 'Failed to load this page.');
+            } finally {
+                loadingOverlay?.classList.add('hidden');
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+

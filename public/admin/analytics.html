@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Analytics</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+    <style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .analytics-card.full {
+            grid-column: span 2;
+        }
+
+        .analytics-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analytics-title i {
+            color: var(--cyan);
+        }
+
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        /* Resolution Time Widget */
+        .resolution-widget {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .resolution-circle {
+            width: 150px;
+            height: 150px;
+            position: relative;
+        }
+
+        .resolution-circle canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .resolution-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .resolution-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .resolution-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .resolution-comparison {
+            flex: 1;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .comparison-value {
+            font-weight: 600;
+        }
+
+        .comparison-value.green {
+            color: var(--green);
+        }
+
+        .comparison-value.red {
+            color: var(--red);
+        }
+
+        /* Contamination Areas */
+        .areas-list {
+            list-style: none;
+        }
+
+        .area-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: var(--light);
+        }
+
+        .area-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fee2e2;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .area-info {
+            flex: 1;
+        }
+
+        .area-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .area-count {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .area-badge {
+            padding: 4px 10px;
+            background: #fee2e2;
+            color: var(--red);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-card.full {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+
+            .resolution-widget {
+                flex-direction: column;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        @keyframes loadingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item active"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1 class="header-title">Report & Analytics</h1>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div class="analytics-grid">
+                <!-- Monthly Trends -->
+                <div class="analytics-card">
+                    <h3 class="analytics-title"><i class="fas fa-chart-area"></i> Monthly Water Issue Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Most Reported Buildings -->
+                <div class="analytics-card">
+                    <h3 class="analytics-title"><i class="fas fa-building"></i> Most Reported Buildings</h3>
+                    <div class="chart-container">
+                        <canvas id="buildingsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Average Resolution Time -->
+                <div class="analytics-card">
+                    <h3 class="analytics-title"><i class="fas fa-clock"></i> Average Resolution Time</h3>
+                    <div class="resolution-widget">
+                        <div class="resolution-circle">
+                            <canvas id="resolutionChart"></canvas>
+                            <div class="resolution-value">
+                                <div class="resolution-number" id="resolutionDays">0</div>
+                                <div class="resolution-label">Days</div>
+                            </div>
+                        </div>
+                        <div class="resolution-comparison">
+                            <div class="comparison-item">
+                                <span class="comparison-label">vs Last Month</span>
+                                <span class="comparison-value green" id="vsLastMonth">-</span>
+                            </div>
+                            <div class="comparison-item">
+                                <span class="comparison-label">Target</span>
+                                <span class="comparison-value">2.0 Days</span>
+                            </div>
+                            <div class="comparison-item">
+                                <span class="comparison-label">Best Month</span>
+                                <span class="comparison-value" id="bestMonth">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recurring Contamination Areas -->
+                <div class="analytics-card">
+                    <h3 class="analytics-title"><i class="fas fa-exclamation-triangle"></i> Recurring Contamination
+                        Areas</h3>
+                    <ul class="areas-list" id="areasList">
+                        <!-- Areas will be loaded here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard, adminLogout } from '../js/admin-auth.js';
+        import { getDashboardStats } from '../js/admin.js';
+        import { logError, logWarn } from '../js/shared/logger.js';
+
+        function ensureChartJsLoaded() {
+            if (window.Chart) return Promise.resolve(window.Chart);
+
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector('script[data-hydro-chartjs]');
+                if (existing) {
+                    existing.addEventListener('load', () => resolve(window.Chart));
+                    existing.addEventListener('error', () => reject(new Error('Chart.js failed to load')));
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                script.async = true;
+                script.dataset.hydroChartjs = '1';
+                script.onload = () => resolve(window.Chart);
+                script.onerror = () => reject(new Error('Chart.js failed to load'));
+                document.head.appendChild(script);
+            });
+        }
+
+        async function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            try {
+                await initAdminAuthGuard();
+                await loadAnalytics();
+            } catch (error) {
+                logError('Init error:', error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const data = await getDashboardStats();
+
+                try {
+                    await ensureChartJsLoaded();
+                    renderTrendsChart(data.monthlyTrends || {});
+                    renderBuildingsChart(data.buildingDistribution || {});
+                    renderResolutionWidget(data.resolutionTime || {});
+                } catch (error) {
+                    logWarn('Chart.js unavailable, skipping charts:', error);
+                }
+                renderContaminationAreas(data.recurringContaminationAreas || []);
+
+            } catch (error) {
+                logError('Error loading analytics:', error);
+            }
+        }
+
+        function renderTrendsChart(monthlyData) {
+            if (!window.Chart) return;
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            const labels = Object.keys(monthlyData).sort().slice(-6);
+            const values = labels.map(l => monthlyData[l] || 0);
+
+            const monthFormatter = new Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', month: 'short' });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length ? labels.map(l => {
+                        const [y, m] = l.split('-');
+                        const year = Number(y) || 0;
+                        const month = (Number(m) || 1) - 1;
+                        return monthFormatter.format(new Date(Date.UTC(year, month, 1)));
+                    }) : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Reports',
+                        data: values.length ? values : [0, 0, 0, 0, 0, 0],
+                        borderColor: '#0891b2',
+                        backgroundColor: 'rgba(8, 145, 178, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function renderBuildingsChart(buildingData) {
+            if (!window.Chart) return;
+            const ctx = document.getElementById('buildingsChart').getContext('2d');
+            const sorted = Object.entries(buildingData).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const labels = sorted.map(([k]) => k);
+            const values = sorted.map(([, v]) => v);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length ? labels : ['No Data'],
+                    datasets: [{
+                        label: 'Reports',
+                        data: values.length ? values : [0],
+                        backgroundColor: ['#dc2626', '#f59e0b', '#10b981', '#0891b2', '#6366f1'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function formatMonthKey(key) {
+            const raw = String(key || '').trim();
+            const match = raw.match(/^(\d{4})-(\d{2})$/);
+            if (!match) return raw;
+            const year = Number(match[1]);
+            const month0 = Number(match[2]) - 1;
+            if (!Number.isFinite(year) || !Number.isFinite(month0)) return raw;
+            const fmt = new Intl.DateTimeFormat('en-PH', { timeZone: 'Asia/Manila', year: 'numeric', month: 'short' });
+            return fmt.format(new Date(Date.UTC(year, month0, 1)));
+        }
+
+        function renderResolutionWidget(resolutionTime) {
+            const res = resolutionTime && typeof resolutionTime === 'object' ? resolutionTime : {};
+            const currentHours = typeof res.currentAvgHours === 'number' ? res.currentAvgHours : null;
+            const prevHours = typeof res.previousAvgHours === 'number' ? res.previousAvgHours : null;
+            const bestHours = typeof res.bestAvgHours === 'number' ? res.bestAvgHours : null;
+            const bestMonthKey = res.bestMonth ? String(res.bestMonth) : '';
+
+            const currentDays = typeof currentHours === 'number' ? (currentHours / 24) : null;
+            const prevDays = typeof prevHours === 'number' ? (prevHours / 24) : null;
+            const bestDays = typeof bestHours === 'number' ? (bestHours / 24) : null;
+
+            document.getElementById('resolutionDays').textContent = typeof currentDays === 'number' ? currentDays.toFixed(1) : '--';
+
+            // Circular progress
+            const ctx = document.getElementById('resolutionChart').getContext('2d');
+            const safeDays = typeof currentDays === 'number' ? currentDays : 0;
+            const progress = Math.min(safeDays / 5, 1); // 5 days max
+            if (!window.Chart) return;
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [progress * 100, 100 - progress * 100],
+                        backgroundColor: [typeof currentDays !== 'number' ? '#94a3b8' : currentDays <= 2 ? '#10b981' : currentDays <= 3 ? '#f59e0b' : '#dc2626', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+
+            // Comparison
+            const vsEl = document.getElementById('vsLastMonth');
+            if (typeof currentDays === 'number' && typeof prevDays === 'number') {
+                const diff = currentDays - prevDays;
+                vsEl.textContent = diff > 0 ? `+${diff.toFixed(1)} Days` : `${diff.toFixed(1)} Days`;
+                vsEl.className = `comparison-value ${diff < 0 ? 'green' : 'red'}`;
+            } else {
+                vsEl.textContent = '--';
+                vsEl.className = 'comparison-value';
+            }
+
+            const bestEl = document.getElementById('bestMonth');
+            if (bestMonthKey && typeof bestDays === 'number') {
+                bestEl.textContent = `${bestDays.toFixed(1)} Days (${formatMonthKey(bestMonthKey)})`;
+            } else {
+                bestEl.textContent = '--';
+            }
+        }
+
+        function renderContaminationAreas(areas) {
+            const container = document.getElementById('areasList');
+            const list = Array.isArray(areas) ? areas : [];
+            const sorted = [...list].sort((a, b) => Number(b.count || 0) - Number(a.count || 0)).slice(0, 5);
+
+            if (!sorted.length) {
+                container.innerHTML = '<p style="color: var(--gray); text-align: center;">No recurring contamination areas (last 90 days)</p>';
+                return;
+            }
+
+            container.innerHTML = sorted.map((area, i) => {
+                const building = String(area.building || 'Unknown').trim();
+                const floor = String(area.floor || '').trim();
+                const location = String(area.location || '').trim();
+                const label = [building, floor, location].filter(Boolean).join(' - ');
+                const count = Number(area.count || 0);
+                return `
+                    <li class="area-item">
+                        <div class="area-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="area-info">
+                            <div class="area-name">${label || building}</div>
+                            <div class="area-count">${count} report${count === 1 ? '' : 's'} (last 90 days)</div>
+                        </div>
+                        <span class="area-badge">#${i + 1}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+

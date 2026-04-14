@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO - Profile Settings</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .loading-spinner-large {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            font-size: 1.6rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 0.95rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+.main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+.profile-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #f8fafc;
+            transition: border-color 0.15s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .form-input:disabled {
+            background: #e2e8f0;
+            cursor: not-allowed;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .message.error {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        /* Avatar Upload */
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            background: var(--gray-light);
+        }
+
+        .avatar-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 3px solid var(--primary-dark);
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            border: 2px solid white;
+            transition: transform 0.2s;
+        }
+
+        .avatar-overlay-btn {
+            border: 0;
+            cursor: pointer;
+        }
+
+        .avatar-overlay-view {
+            left: 0;
+            right: auto;
+            background: var(--primary-dark);
+        }
+
+        .avatar-wrapper:hover .avatar-overlay {
+            transform: scale(1.1);
+        }
+
+        .avatar-info h3 {
+            margin-bottom: 0.3rem;
+            color: var(--text);
+        }
+
+        .avatar-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Avatar Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 1rem auto;
+            border: 3px solid var(--gray-light);
+            display: block;
+        }
+
+        .file-input-hidden {
+            display: none;
+        }
+
+        .btn-upload-select {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7rem 1.2rem;
+            background: var(--gray-light);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin: 0.5rem;
+        }
+
+        .btn-upload-select:hover {
+            background: #cbd5e1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            padding: 0.7rem 1.2rem;
+            background: var(--gray-light);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner-large"></div>
+    </div>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-droplet"></i>
+                HYDRO
+            </div>
+
+            <button type="button" class="submit-btn sidebar-submit-btn" data-open-submit-modal>
+                <i class="fa-solid fa-plus"></i>
+                Submit New Water Report
+            </button>
+
+                  <ul class="nav-list">
+        <li class="nav-item" data-nav-path="/index.html" onclick="location.href='index.html'"><i class="fa-solid fa-house"></i> Dashboard</li>
+        <li class="nav-item" data-nav-path="/MyRecords.html" onclick="location.href='MyRecords.html'"><i class="fa-solid fa-file-lines"></i> My Records</li>
+        <li class="nav-item" data-nav-path="/notifications.html" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i> Announcements</li>
+        <li class="nav-item" data-nav-path="/profile.html" onclick="location.href='profile.html'"><i class="fa-solid fa-user"></i> Profile</li>
+        <li class="nav-item" data-nav-path="/faq.html" onclick="location.href='faq.html'"><i class="fa-solid fa-circle-question"></i> FAQ</li>
+      </ul>
+
+        </aside>
+
+        <main class="main">
+
+            <header>
+                <h1>Profile Settings</h1>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">--</div>
+                    <div>
+                        <div><strong id="userName">Loading...</strong></div>
+                        <div class="role-label">Student</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn" title="Log out">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Personal Information -->
+            <div class="profile-section">
+                <h2 class="section-title"><i class="fa-solid fa-user"></i> Personal Information</h2>
+
+                <!-- Avatar Upload Section -->
+                <div class="avatar-section">
+                    <div class="avatar-wrapper" id="avatarWrapper">
+                        <div class="avatar-placeholder" id="profileAvatarPlaceholder">--</div>
+                        <img src="" alt="Profile" class="profile-avatar" id="profileAvatarImg" style="display: none;">
+                        <button type="button" class="avatar-overlay avatar-overlay-btn avatar-overlay-view" id="viewAvatarBtn" aria-label="View profile photo" style="display:none;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                        <div class="avatar-overlay" aria-hidden="true">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="avatar-info">
+                        <h3>Profile Photo</h3>
+                        <p>Click to upload or change your photo</p>
+                    </div>
+                </div>
+
+                <div class="message" id="profileMessage"></div>
+
+                <form id="profileForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email (cannot be changed)</label>
+                            <input type="email" class="form-input" id="profileEmail" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" id="profilePhone" placeholder="+63 XXX XXX XXXX">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Change Password -->
+            <div class="profile-section">
+                <h2 class="section-title"><i class="fa-solid fa-lock"></i> Change Password</h2>
+
+                <div class="message" id="passwordMessage"></div>
+
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="currentPassword" required autocomplete="current-password">
+                            <button type="button" class="password-toggle" data-toggle="currentPassword" aria-label="Toggle password visibility" aria-pressed="false">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">New Password (8-16 chars)</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-input" id="newPassword" required minlength="8" maxlength="16" autocomplete="new-password">
+                                <button type="button" class="password-toggle" data-toggle="newPassword" aria-label="Toggle password visibility" aria-pressed="false">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-input" id="confirmPassword" required minlength="8" maxlength="16" autocomplete="new-password">
+                                <button type="button" class="password-toggle" data-toggle="confirmPassword" aria-label="Toggle password visibility" aria-pressed="false">
+                                    <i class="fa-regular fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Avatar Upload Modal -->
+    <div class="modal-overlay" id="avatarModal">
+        <div class="modal-card">
+            <h3 class="modal-title">Update Profile Photo</h3>
+            <img src="" alt="Preview" class="preview-avatar" id="avatarPreview">
+            <input type="file" class="file-input-hidden" id="avatarFileInput" accept="image/*">
+            <button type="button" class="btn-upload-select" id="selectPhotoBtn">
+                <i class="fa-solid fa-image"></i> Select Photo
+            </button>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" id="cancelAvatarBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAvatarBtn" disabled>
+                    <span id="saveAvatarText">Save Photo</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module" src="/js/student-init.js"></script>
+    <script type="module">
+        import { logOut, getStudentProfile, updateStudentProfile, changePassword } from './js/auth.js';
+        import { requireAuth } from './js/auth/auth-guard.js';
+        import { ROLES } from './js/config/app-constants.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js';
+        import { auth } from './js/firebase-config.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { validateRequired, validateLength, validatePhone, validatePassword, firstValidationError } from './js/validation/validation.js';
+        import { bindPasswordVisibilityToggles } from './js/ui/password-toggle.js';
+        import { initHydroLightbox, openHydroLightbox } from './js/ui/lightbox.js';
+        import { handleRateLimitError } from './js/shared/rate-limit-ui.js';
+        import { showToast } from './js/ui/notice.js';
+        import { logError } from './js/shared/logger.js';
+
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Profile form elements
+        const profileForm = document.getElementById('profileForm');
+        const profileMessage = document.getElementById('profileMessage');
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profilePhone = document.getElementById('profilePhone');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+
+        // Password form elements
+        const passwordForm = document.getElementById('passwordForm');
+        const passwordMessage = document.getElementById('passwordMessage');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+
+        // Avatar elements
+        const avatarWrapper = document.getElementById('avatarWrapper');
+        const profileAvatarPlaceholder = document.getElementById('profileAvatarPlaceholder');
+        const profileAvatarImg = document.getElementById('profileAvatarImg');
+        const viewAvatarBtn = document.getElementById('viewAvatarBtn');
+        const avatarModal = document.getElementById('avatarModal');
+        const avatarFileInput = document.getElementById('avatarFileInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const selectPhotoBtn = document.getElementById('selectPhotoBtn');
+        const cancelAvatarBtn = document.getElementById('cancelAvatarBtn');
+        const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+        const saveAvatarText = document.getElementById('saveAvatarText');
+
+        let currentAvatarFile = null;
+        let currentProfile = null;
+
+        async function bootstrap() {
+            const authState = await requireAuth({
+                allowedRoles: [ROLES.STUDENT],
+            });
+            const user = authState.user;
+            await loadProfile(user);
+            setupAvatarUpload();
+            initHydroLightbox();
+        }
+
+        bootstrap().catch((error) => {
+            if (error?.message !== 'redirect') {
+                logError('[profile] bootstrap failed', error);
+            }
+        });
+
+        bindPasswordVisibilityToggles();
+
+        logoutBtn.addEventListener('click', () => {
+            logOut();
+        });
+
+        async function loadProfile(user) {
+            const profile = await getStudentProfile();
+            currentProfile = profile;
+
+            const displayName = profile?.name || user.displayName || user.email?.split('@')[0] || 'Student';
+            const avatarUrl = profile?.avatarUrl || user.photoURL;
+
+            userName.textContent = displayName;
+
+            // Display photo in header avatar if available, otherwise show initials
+            if (avatarUrl) {
+                userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="profile-${user.uid}" onerror="this.parentElement.textContent='${getInitials(displayName)}'; this.remove();">`;
+            } else {
+                userAvatar.textContent = getInitials(displayName);
+            }
+
+            profileName.value = profile?.name || '';
+            profileEmail.value = user.email || '';
+            profilePhone.value = profile?.phone || '';
+            // Load avatar
+            if (profile?.avatarUrl) {
+                profileAvatarImg.src = profile.avatarUrl;
+                profileAvatarImg.style.display = 'block';
+                profileAvatarPlaceholder.style.display = 'none';
+                if (viewAvatarBtn) viewAvatarBtn.style.display = 'flex';
+            } else {
+                profileAvatarPlaceholder.textContent = getInitials(displayName);
+                if (viewAvatarBtn) viewAvatarBtn.style.display = 'none';
+            }
+
+        }
+
+        function setupAvatarUpload() {
+            if (viewAvatarBtn) {
+                viewAvatarBtn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const src = String(profileAvatarImg?.src || '').trim();
+                    if (!src) return;
+                    openHydroLightbox([src], 0);
+                });
+            }
+
+            avatarWrapper.addEventListener('click', () => {
+                avatarModal.classList.add('active');
+                // Reset state
+                currentAvatarFile = null;
+                avatarPreview.src = profileAvatarImg.src || '';
+                saveAvatarBtn.disabled = true;
+            });
+
+            selectPhotoBtn.addEventListener('click', () => {
+                avatarFileInput.click();
+            });
+
+            avatarFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        showToast('Please choose an image file to upload.', { type: 'warning' });
+                        return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('Please choose an image under 5MB.', { type: 'warning' });
+                        return;
+                    }
+                    currentAvatarFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        avatarPreview.src = e.target.result;
+                        try {
+                            avatarPreview.setAttribute('data-hydro-lightbox', '');
+                            avatarPreview.setAttribute('data-lightbox-src', e.target.result);
+                            avatarPreview.setAttribute('data-lightbox-group', `profile-preview-${auth.currentUser?.uid || ''}`);
+                        } catch (_) {
+                        }
+                        saveAvatarBtn.disabled = false;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            cancelAvatarBtn.addEventListener('click', () => {
+                avatarModal.classList.remove('active');
+                currentAvatarFile = null;
+            });
+
+            saveAvatarBtn.addEventListener('click', uploadAvatar);
+        }
+
+        async function uploadAvatar() {
+            if (!currentAvatarFile) return;
+
+            saveAvatarBtn.disabled = true;
+            saveAvatarText.textContent = 'Uploading...';
+
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not logged in');
+
+                // Compress image
+                const compressedFile = await compressImage(currentAvatarFile);
+
+                // Upload to Firebase Storage
+                const storage = getStorage();
+                // Use a unique filename to avoid stale browser caches.
+                const avatarRef = ref(storage, `avatars/${user.uid}/avatar-${Date.now()}.jpg`);
+                await uploadBytes(avatarRef, compressedFile);
+                const downloadURL = await getDownloadURL(avatarRef);
+
+                // Update profile via Cloud Function
+                const functions = getFunctions(undefined, 'asia-southeast1');
+                const updateProfile = httpsCallable(functions, 'updateUserProfile');
+                await updateProfile({ avatarUrl: downloadURL });
+
+                const displayUrl = `${downloadURL}${downloadURL.includes('?') ? '&' : '?'}v=${Date.now()}`;
+
+                // Update UI
+                profileAvatarImg.src = displayUrl;
+                profileAvatarImg.style.display = 'block';
+                profileAvatarPlaceholder.style.display = 'none';
+                if (viewAvatarBtn) viewAvatarBtn.style.display = 'flex';
+
+                // Update header avatar immediately.
+                if (userAvatar) {
+                    userAvatar.innerHTML = `<img src="${displayUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${downloadURL}" data-lightbox-group="profile-${user.uid}" onerror="this.parentElement.textContent='${getInitials(String(profileName.value || user.displayName || '').trim() || 'U')}'; this.remove();">`;
+                    initHydroLightbox();
+                }
+
+                // Update cached profile for this session.
+                currentProfile = {
+                    ...(currentProfile || {}),
+                    avatarUrl: downloadURL,
+                };
+
+                avatarModal.classList.remove('active');
+                profileMessage.textContent = 'Profile photo updated!';
+                profileMessage.classList.add('show', 'success');
+                setTimeout(() => profileMessage.classList.remove('show'), 3000);
+            } catch (error) {
+                logError('Avatar upload error:', error);
+                if (handleRateLimitError(error)) {
+                    profileMessage.textContent = 'Too many actions. Please wait a bit and try again.';
+                    profileMessage.classList.add('show', 'error');
+                    setTimeout(() => profileMessage.classList.remove('show'), 3000);
+                    return;
+                }
+                profileMessage.textContent = 'Could not upload your photo right now. Please try again.';
+                profileMessage.classList.add('show', 'error');
+                setTimeout(() => profileMessage.classList.remove('show'), 3000);
+            } finally {
+                saveAvatarBtn.disabled = false;
+                saveAvatarText.textContent = 'Save Photo';
+            }
+        }
+
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                img.onload = () => {
+                    const maxSize = 400;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxSize) {
+                            height = (height * maxSize) / width;
+                            width = maxSize;
+                        }
+                    } else {
+                        if (height > maxSize) {
+                            width = (width * maxSize) / height;
+                            height = maxSize;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, 'image/jpeg', 0.8);
+                };
+
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            saveProfileBtn.disabled = true;
+            saveProfileBtn.textContent = 'Saving...';
+            profileMessage.classList.remove('show', 'success', 'error');
+
+            const validationError = firstValidationError([
+                validateRequired(profileName.value, 'Name'),
+                validateLength(profileName.value, { min: 2, max: 120, label: 'Name' }),
+                validatePhone(profilePhone.value, { required: false }),
+            ]);
+
+            if (validationError) {
+                profileMessage.textContent = validationError;
+                profileMessage.classList.add('show', 'error');
+                saveProfileBtn.disabled = false;
+                saveProfileBtn.textContent = 'Save Changes';
+                return;
+            }
+
+            const result = await updateStudentProfile({
+                name: profileName.value.trim(),
+                phone: profilePhone.value.trim(),
+            });
+
+            if (result.success) {
+                profileMessage.textContent = 'Profile updated successfully!';
+                profileMessage.classList.add('show', 'success');
+                const nextName = profileName.value.trim();
+                userName.textContent = nextName;
+
+                // Keep header avatar image if present.
+                const avatarUrl = String(currentProfile?.avatarUrl || profileAvatarImg?.src || auth.currentUser?.photoURL || '').trim();
+                if (avatarUrl) {
+                    userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="profile-${auth.currentUser?.uid || ''}" onerror="this.parentElement.textContent='${getInitials(nextName)}'; this.remove();">`;
+                    initHydroLightbox();
+                } else {
+                    userAvatar.textContent = getInitials(nextName);
+                }
+
+                // Update cached profile for this session.
+                currentProfile = {
+                    ...(currentProfile || {}),
+                    name: nextName,
+                    phone: profilePhone.value.trim(),
+                };
+            } else {
+                profileMessage.textContent = result.error;
+                profileMessage.classList.add('show', 'error');
+            }
+
+            saveProfileBtn.disabled = false;
+            saveProfileBtn.textContent = 'Save Changes';
+        });
+
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const newPass = newPasswordInput.value;
+            const confirmPass = confirmPasswordInput.value;
+
+            if (newPass !== confirmPass) {
+                passwordMessage.textContent = 'New passwords do not match.';
+                passwordMessage.classList.add('show', 'error');
+                return;
+            }
+
+            const passwordCheck = validatePassword(newPass);
+            if (!passwordCheck.valid) {
+                passwordMessage.textContent = passwordCheck.errors[0];
+                passwordMessage.classList.add('show', 'error');
+                return;
+            }
+
+            changePasswordBtn.disabled = true;
+            changePasswordBtn.textContent = 'Changing...';
+            passwordMessage.classList.remove('show', 'success', 'error');
+
+            const result = await changePassword(currentPasswordInput.value, newPass);
+
+            if (result.success) {
+                passwordMessage.textContent = 'Password changed successfully!';
+                passwordMessage.classList.add('show', 'success');
+                passwordForm.reset();
+            } else {
+                passwordMessage.textContent = result.error;
+                passwordMessage.classList.add('show', 'error');
+            }
+
+            changePasswordBtn.disabled = false;
+            changePasswordBtn.textContent = 'Change Password';
+        });
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+    </script>
+
+</body>
+
+</html>
+ 
+
+
+
+

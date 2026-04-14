@@ -1,0 +1,364 @@
+rules_version = '2';
+
+/**
+ * HYDRO - Firestore Security Rules
+ * 
+ * Security Principles:
+ * - Role-based access control (student, admin, maintenance)
+ * - Students can ONLY access their own data
+ * - Admin can view all reports and manage assignments
+ * - Super Admin can manage users and roles
+ * - Maintenance can only access their assigned tasks
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if authenticated user owns this document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasUserDoc() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // Get user role from users collection
+    function getUserRole() {
+      return hasUserDoc() ? getUserDoc().role : null;
+    }
+
+    function isActiveUser() {
+      return isAuthenticated()
+             && hasUserDoc()
+             && getUserDoc().isArchived != true
+             && getUserDoc().status == 'active'
+             && getUserDoc().activated != false;
+    }
+    
+    // Check if user is admin or super_admin
+    function isAdmin() {
+      return isActiveUser() && getUserRole() in ['admin', 'super_admin'];
+    }
+    
+    // Check if user is super_admin only
+    function isSuperAdmin() {
+      return isActiveUser() && getUserRole() == 'super_admin';
+    }
+    
+    // Check if user is maintenance staff
+    function isMaintenance() {
+      return isActiveUser() && getUserRole() == 'maintenance';
+    }
+    
+    // Validate string field exists and is not empty
+    function isValidString(field) {
+      return field is string && field.size() > 0;
+    }
+    
+    // Validate timestamp field
+    function isValidTimestamp(field) {
+      return field is timestamp;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // USERS COLLECTION (role, department, etc.)
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /users/{userId} {
+      // Users can ALWAYS read their own profile (needed for role check on login)
+      // Admins can read all user profiles
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      
+      // Only Cloud Functions create user docs (on signup)
+      // Super Admin can update roles via Cloud Functions
+      allow create: if false; // Created by Cloud Functions only
+      allow update: if false; // Updated by Cloud Functions only
+      allow delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // STUDENTS COLLECTION (student profile details)
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /students/{studentId} {
+      // Students can only read their own profile
+      // Admin can read all student profiles
+      allow read: if (isOwner(studentId) && isActiveUser()) || isAdmin();
+      
+      // Client profile writes are done via Cloud Functions (audited). 
+      allow create: if false;
+      allow update: if false;
+      
+      allow delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // REPORTS COLLECTION
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /reports/{reportId} {
+      // Valid canonical issue types.
+      function isValidIssueType(value) {
+        return value in [
+          'no_water',
+          'leak',
+          'contaminated',
+          'low_pressure',
+          'clogged',
+          'clogged_toilet',
+          'leaking_pipes',
+          'discoloration',
+          'odor',
+          'flooding',
+          'pipe_damage',
+          'other'
+        ];
+      }
+      
+      // Valid canonical risk levels.
+      function isValidRiskLevel(value) {
+        return value in ['low', 'medium', 'high', 'urgent'];
+      }
+
+      function isValidReporterSnapshot(snapshot) {
+        return snapshot is map
+               && snapshot.keys().hasOnly(['uid', 'name', 'email', 'phoneNumber', 'role'])
+               && snapshot.uid is string
+               && snapshot.uid == request.auth.uid
+               && snapshot.role is string
+               && snapshot.role == getUserRole()
+               && snapshot.name is string
+               && snapshot.name.size() <= 120
+               && snapshot.email is string
+               && snapshot.email.size() <= 200
+               && snapshot.phoneNumber is string
+               && snapshot.phoneNumber.size() <= 40;
+      }
+
+      function isValidReportCreate() {
+        return request.resource.data.keys().hasOnly([
+                 'studentId',
+                 'status',
+                 'createdAt',
+                 'updatedAt',
+                 'building',
+                 'floor',
+                 'location',
+                 'issueType',
+                 'riskLevel',
+                 'description',
+                 'photoUrl',
+                 'photoUrls',
+                 'createdByName',
+                 'reporterSnapshot'
+               ])
+               && request.resource.data.studentId == request.auth.uid
+               && request.resource.data.status == 'pending'
+               && isValidString(request.resource.data.building)
+               && request.resource.data.building.size() <= 60
+               && isValidString(request.resource.data.floor)
+               && request.resource.data.floor.size() <= 60
+               && isValidString(request.resource.data.location)
+               && request.resource.data.location.size() <= 120
+               && isValidString(request.resource.data.description)
+               && request.resource.data.description.size() <= 1200
+                && isValidIssueType(request.resource.data.issueType)
+                && isValidRiskLevel(request.resource.data.riskLevel)
+                // Risk level is admin-managed; new client-created reports must default to the lowest severity.
+                && request.resource.data.riskLevel == 'low'
+                // createdAt/updatedAt must be server time
+                && request.resource.data.createdAt == request.time
+                && request.resource.data.updatedAt == request.time
+               && (request.resource.data.photoUrl is string && request.resource.data.photoUrl == '')
+               && (request.resource.data.photoUrls is list && request.resource.data.photoUrls.size() == 0)
+               && (
+                 !('createdByName' in request.resource.data)
+                 || (request.resource.data.createdByName is string && request.resource.data.createdByName.size() <= 120)
+               )
+               && (
+                 !('reporterSnapshot' in request.resource.data)
+                 || isValidReporterSnapshot(request.resource.data.reporterSnapshot)
+               );
+      }
+
+       function isValidPhotoUrls(listValue) {
+         return listValue is list
+                && listValue.size() <= 3
+                && (
+                  listValue.size() == 0
+                  || (
+                    listValue[0] is string
+                    && listValue[0].size() > 0
+                    && listValue[0].size() <= 1500
+                    && listValue[0].matches('^https://')
+                  )
+                )
+                && (
+                  listValue.size() < 2
+                  || (
+                    listValue[1] is string
+                    && listValue[1].size() > 0
+                    && listValue[1].size() <= 1500
+                    && listValue[1].matches('^https://')
+                  )
+                )
+                && (
+                  listValue.size() < 3
+                  || (
+                    listValue[2] is string
+                    && listValue[2].size() > 0
+                    && listValue[2].size() <= 1500
+                    && listValue[2].matches('^https://')
+                  )
+                );
+       }
+
+       // Allow creator to attach up to 3 photos after create (append-only).
+       function isPhotoUrlsUpdate() {
+         let changed = request.resource.data.diff(resource.data).changedKeys();
+         let oldList = ('photoUrls' in resource.data) && resource.data.photoUrls is list ? resource.data.photoUrls : [];
+         let newList = ('photoUrls' in request.resource.data) && request.resource.data.photoUrls is list ? request.resource.data.photoUrls : [];
+
+         let photoUrlOk = !('photoUrl' in request.resource.data)
+                          || (request.resource.data.photoUrl is string && request.resource.data.photoUrl.size() <= 1500);
+
+         // If photoUrl is set, it must match the first item in photoUrls.
+         let photoUrlAligned = !('photoUrl' in request.resource.data)
+                               || (newList.size() > 0 && request.resource.data.photoUrl == newList[0]);
+
+          return changed.hasOnly(['photoUrl', 'photoUrls', 'updatedAt'])
+                 && resource.data.studentId == request.auth.uid
+                 && request.resource.data.updatedAt == request.time
+                 && isValidPhotoUrls(newList)
+                 && newList.size() >= oldList.size()
+                 && newList.hasAll(oldList)
+                 && photoUrlOk
+                 && photoUrlAligned;
+       }
+      
+       // Students can read their own reports
+       // Admin can read ALL reports
+       // Maintenance can read reports they're assigned to
+       allow read: if isActiveUser() && (
+                     resource.data.studentId == request.auth.uid ||
+                     isAdmin() ||
+                     (
+                       isMaintenance() && (
+                         resource.data.assignedTo == request.auth.uid
+                         || (
+                           ('assignedToUids' in resource.data)
+                           && (resource.data.assignedToUids is list)
+                           && (request.auth.uid in resource.data.assignedToUids)
+                         )
+                       )
+                     )
+                   );
+      
+       // Active users can create reports (student/admin/maintenance)
+       allow create: if isActiveUser() && isValidReportCreate();
+      
+       // Admin updates happen through Cloud Functions (admin SDK bypasses rules).
+       // Client-side update is limited to photo attachment by creator (append-only, max 3).
+       allow update: if isActiveUser() && isPhotoUrlsUpdate();
+       allow delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // TASKS COLLECTION
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /tasks/{taskId} {
+      // Admin can read all tasks
+      // Maintenance can read their assigned tasks
+      allow read: if isActiveUser() && (
+                    isAdmin() || 
+                    (isMaintenance() && resource.data.assignedTo == request.auth.uid)
+                  );
+      
+      // Tasks created/updated via Cloud Functions only
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ANNOUNCEMENTS COLLECTION
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /announcements/{announcementId} {
+      allow read: if isActiveUser()
+                  && resource.data.isActive == true
+                  && (
+                    resource.data.audience == 'all'
+                    || resource.data.audience == getUserRole()
+                    || (getUserRole() == 'super_admin' && resource.data.audience == 'admin')
+                  );
+
+      allow read: if isAdmin();
+      
+      // Created/updated via Cloud Functions only
+      allow create, update, delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // LOCATIONS COLLECTION (for student report dropdown)
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /locations/{locationId} {
+      // All authenticated users can read active locations
+      allow read: if isActiveUser();
+      
+      // Managed via Cloud Functions only
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // FAQS COLLECTION
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /faqs/{faqId} {
+      allow read: if isActiveUser();
+      allow write: if false;
+    }
+
+    match /systemConfig/{docId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /audit_logs/{auditId} {
+      allow read: if isAdmin();
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    match /securityLogs/{docId} {
+      allow read, write: if false;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // CATCH-ALL: Deny everything else
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

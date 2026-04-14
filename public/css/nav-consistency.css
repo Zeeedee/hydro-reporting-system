@@ -1,0 +1,49 @@
+/* Phase 3: Sidebar spacing/icon/target-size consistency (no theme color changes) */
+
+.sidebar .nav-list,
+.sidebar .sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sidebar .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.78rem 1.5rem;
+  line-height: 1.25;
+}
+
+.sidebar a.nav-item {
+  text-decoration: none;
+  color: inherit;
+}
+
+.sidebar .nav-item i {
+  width: 1.1rem;
+  min-width: 1.1rem;
+  text-align: center;
+  font-size: 0.98rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sidebar .nav-item,
+.sidebar .nav-item:hover,
+.sidebar .nav-item.active,
+.sidebar .nav-item.is-active {
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+@media (max-width: 640px) {
+  .sidebar .nav-item {
+    min-height: 46px;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+  }
+}

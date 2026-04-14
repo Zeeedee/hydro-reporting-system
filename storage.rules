@@ -1,0 +1,171 @@
+rules_version = '2';
+
+/**
+ * HYDRO - Firebase Storage Security Rules (Phase 2: Role-Based Access)
+ * 
+ * Security Principles:
+ * - Students can only upload to their own folders
+ * - Admins and maintenance can read all report photos
+ * - File size limits prevent abuse
+ * - Only image files allowed
+ */
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ═══════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user owns this path
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Check if file is an image
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isAllowedReportImageType() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+    
+    // Roles are stored in Firestore users collection (not custom claims).
+    function getUserRole() {
+      return firestore.get(
+        /databases/(default)/documents/users/$(request.auth.uid)
+      ).data.role;
+    }
+
+    function isActiveUser() {
+      return isAuthenticated()
+             && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isArchived != true
+             && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.status == 'active'
+             && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.activated != false;
+    }
+    
+    function hasAdminRole() {
+      return isAuthenticated() && getUserRole() in ['admin', 'super_admin'];
+    }
+
+    function hasMaintenanceRole() {
+      return isAuthenticated() && getUserRole() == 'maintenance';
+    }
+    
+    function hasStaffRole() {
+      return hasAdminRole() || hasMaintenanceRole();
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // REPORT PHOTOS (legacy)
+    // Path: /reports/{studentId}/{reportId}/{fileName}
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /reports/{studentId}/{reportId}/{fileName} {
+      // Owner, admins, and maintenance can view report photos
+      allow read: if isActiveUser() 
+                  && (isOwner(studentId) || hasStaffRole());
+      
+      // Only the owner can upload to their folder
+      // Constraints:
+      // - Max 5MB file size
+      // - Must be an image
+       allow write: if isActiveUser()
+                     && isOwner(studentId)
+                     && request.resource.size < 5 * 1024 * 1024
+                     && isAllowedReportImageType();
+      
+      // Owner and admins can delete photos
+      allow delete: if isActiveUser() 
+                    && (isOwner(studentId) || hasAdminRole());
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // AVATAR IMAGES
+    // Path: /avatars/{userId}/{fileName}
+    // 
+    // NOTE: Initial uploads can be up to 5MB. Cloud Functions will
+    // automatically compress to ~100KB. This allows for high-quality
+    // source images while keeping storage costs low.
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /avatars/{userId}/{fileName} {
+      // Any authenticated user can view avatars
+      allow read: if isActiveUser();
+      
+      // Only the owner can upload their avatar
+      // Constraints:
+      // - Max 5MB file size (will be compressed by Cloud Functions)
+      // - Must be an image
+      allow write: if isActiveUser()
+                   && isOwner(userId)
+                   && request.resource.size < 5 * 1024 * 1024
+                   && isImage()
+                   && fileName.matches('.*\\.(jpg|jpeg|png|webp)$');
+      
+      // Only owner can delete their avatar
+      allow delete: if isActiveUser() && isOwner(userId);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANNOUNCEMENT ATTACHMENTS
+    // Path: /announcements/{announcementId}/{fileName}
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /announcements/{announcementId}/{fileName} {
+      // Any authenticated user can view announcement attachments
+      allow read: if isActiveUser();
+      
+      // Only admins can upload announcement attachments
+       allow write: if isActiveUser()
+                    && hasAdminRole()
+                    && request.resource.size < 5 * 1024 * 1024
+                   && isImage();
+      
+      // Only admins can delete
+      allow delete: if isAuthenticated() && hasAdminRole();
+    }
+
+    // REPORT PHOTOS (R phase)
+    // Path: /reports/{reportId}/{fileName}
+    match /reports/{reportId}/{fileName} {
+      function getReportOwner() {
+        return firestore.get(
+          /databases/(default)/documents/reports/$(reportId)
+        ).data.studentId;
+      }
+
+      allow read: if isActiveUser()
+                  && (
+                     hasStaffRole()
+                     || request.auth.uid == getReportOwner()
+                  );
+
+      allow write: if isActiveUser()
+                   && request.resource.size < 5 * 1024 * 1024
+                   && isAllowedReportImageType()
+                   && fileName.matches('.*\\.(jpg|jpeg|png|webp)$')
+                   && request.auth.uid == getReportOwner();
+
+      allow delete: if isActiveUser()
+                    && (
+                      hasAdminRole()
+                      || request.auth.uid == getReportOwner()
+                    );
+    }
+    
+    // ═══════════════════════════════════════════════════════════════
+    // CATCH-ALL: Deny everything else
+    // ═══════════════════════════════════════════════════════════════
+    
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

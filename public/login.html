@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HYDRO - Sign In</title>
+    <meta name="description" content="HYDRO Digital Water Safety - Sign In" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%230891b220" fill-opacity="1" d="M0,192L48,176C96,160,192,128,288,133.3C384,139,480,181,576,186.7C672,192,768,160,864,154.7C960,149,1056,171,1152,165.3C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-position: bottom;
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+
+        .auth-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .logo-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2.8rem;
+            color: var(--cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-text {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            color: var(--cyan);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tagline-sub {
+            color: var(--gray);
+            font-size: 0.75rem;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.6rem;
+            font-style: italic;
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .auth-link {
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .auth-link a {
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: var(--danger);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+            text-align: left;
+            border: 1px solid #fecaca;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        .btn-primary.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        .btn-primary.loading {
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fa-solid fa-droplet"></i>
+            </div>
+            <div class="logo-text">HYDRO</div>
+            <div class="tagline">Digital Water Safety</div>
+            <div class="tagline-sub">Logbook and Reporting System</div>
+        </div>
+
+        <h1>Sign In</h1>
+        <p class="subtitle">Sign in to your account</p>
+
+        <div class="error-message" id="errorMsg"></div>
+
+        <form id="loginForm" method="POST" action="#" novalidate>
+            <div class="form-group">
+                <input type="email" class="form-input" id="email" placeholder="Enter email" required
+                    autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+                <div class="password-wrapper">
+                    <input type="password" class="form-input" id="password" placeholder="Enter password" required
+                        autocomplete="current-password" />
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')"
+                        aria-label="Toggle password visibility">
+                        <i class="fa-solid fa-eye-slash" id="passwordIcon"></i>
+                    </button>
+                </div>
+                <div style="text-align:right; margin-top:0.45rem;">
+                    <a href="#" id="forgotPasswordLink" style="font-size:0.85rem; color:var(--cyan); text-decoration:none;">Forgot password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                <span class="loading-spinner"></span>
+                SIGN IN
+            </button>
+        </form>
+
+        <p class="auth-link">Account access is managed by admin.</p>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { signIn, getUserRole, redirectToDashboard } from './js/auth.js';
+        import { auth } from './js/firebase-config.js';
+        import { sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { validateEmail } from './js/validation/validation.js';
+        import { waitForAuthUser, requireActiveUser } from './js/auth/auth-bootstrap.js';
+        import { buildActionCodeSettings } from './js/auth/action-code-settings.js';
+        import { logError } from './js/shared/logger.js';
+
+
+        // Form submission handler
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorDiv = document.getElementById('errorMsg');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+         const reasonMap = {
+             archived: 'Your account is archived. Contact admin.',
+             'not-active': 'Your account setup is not complete or currently suspended.',
+             'profile-missing': 'Account not provisioned. Please contact an administrator.',
+             'auth-error': 'Could not validate your session. Please sign in again.',
+         };
+        const redirectReason = new URLSearchParams(window.location.search).get('reason');
+        if (redirectReason && reasonMap[redirectReason]) {
+            errorDiv.textContent = reasonMap[redirectReason];
+            errorDiv.classList.add('show');
+        }
+
+        forgotPasswordLink.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const emailCheck = validateEmail(email);
+            if (!emailCheck.valid) {
+                errorDiv.textContent = 'Enter your email first to reset password.';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, emailCheck.value, buildActionCodeSettings());
+                errorDiv.textContent = 'Password reset link sent. Check your inbox.';
+                errorDiv.classList.add('show');
+            } catch (_) {
+                errorDiv.textContent = 'Could not send reset link. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const emailCheck = validateEmail(email);
+
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            errorDiv.textContent = '';
+
+            if (!emailCheck.valid) {
+                errorDiv.textContent = emailCheck.error;
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            if (!password || !password.trim()) {
+                errorDiv.textContent = 'Password is required.';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            try {
+                const result = await signIn(email, password);
+
+                if (result.success && result.user) {
+                    const role = result.role || await getUserRole(result.user.uid);
+                    redirectToDashboard(role);
+                } else {
+                    if (result.errorCode === 'mfa-required') {
+                        return;
+                    }
+                    errorDiv.textContent = result.error;
+                    errorDiv.classList.add('show');
+                }
+            } catch (err) {
+                const fallbackMessage = String(err?.message || '').includes('ERR_BLOCKED_BY_CLIENT')
+                    ? 'Browser privacy settings are blocking Firestore. Disable ad blocker or Shields, then try again.'
+                    : 'Unable to complete sign in right now. Please try again.';
+                errorDiv.textContent = fallbackMessage;
+                errorDiv.classList.add('show');
+                logError('Sign In error:', err);
+            } finally {
+                // Reset loading state
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Password visibility toggle
+        window.togglePassword = function (inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + 'Icon');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        };
+        (async function bootstrapSignInPage() {
+            const currentUser = await waitForAuthUser();
+            if (!currentUser) return;
+            try {
+                const activeCheck = await requireActiveUser(currentUser.uid);
+                if (!activeCheck.ok) {
+                    return;
+                }
+                const role = await getUserRole(currentUser.uid);
+                redirectToDashboard(role);
+            } catch (_) {
+            }
+        })();
+    </script>
+</body>
+
+</html> 
+
+
+

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="dropletGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="100%" style="stop-color:#0891b2"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#dropletGradient)" d="M16 2C16 2 5 14 5 21c0 6.1 4.9 11 11 11s11-4.9 11-11C27 14 16 2 16 2z"/>
+  <ellipse fill="rgba(255,255,255,0.3)" cx="12" cy="18" rx="3" ry="4" transform="rotate(-20 12 18)"/>
+</svg>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+    document.documentElement.classList.add('hydro-auth-pending');
+  </script>
+  <style>
+    html.hydro-auth-pending body { opacity: 0 !important; }
+  </style>
+  <title>HYDRO - My Records</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/css/theme.css">
+
+      <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--light);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loading-overlay.hidden {
+      display: none;
+    }
+
+    .loading-spinner-large {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--gray-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .layout {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: var(--primary);
+      color: white;
+      padding: 1.5rem 0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      padding: 0 1.5rem 2rem;
+      font-size: 1.6rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      flex: 1;
+    }
+
+    .nav-item {
+      padding: 0.95rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-item i {
+      width: 20px;
+      text-align: center;
+    }
+.main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2.5rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+.filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+
+    .filter-select {
+      padding: 0.75rem 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: white;
+      min-width: 180px;
+      font-size: 0.95rem;
+    }
+
+    .table-wrapper {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    thead {
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.13s;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 500;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-progress {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-resolved {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .pagination button {
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--gray-light);
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination span {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .reports-warning-banner {
+      display: none;
+      margin-bottom: 1rem;
+      border: 1px solid #fcd34d;
+      background: #fffbeb;
+      color: #92400e;
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .reports-warning-banner.is-visible {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+    <div class="loading-spinner-large"></div>
+  </div>
+
+  <div class="layout">
+
+    <aside class="sidebar">
+      <div class="logo">
+        <i class="fa-solid fa-droplet"></i>
+        HYDRO
+      </div>
+
+      <button type="button" class="submit-btn sidebar-submit-btn" data-open-submit-modal>
+        <i class="fa-solid fa-plus"></i>
+        Submit New Water Report
+      </button>
+
+            <ul class="nav-list">
+        <li class="nav-item" data-nav-path="/index.html" onclick="location.href='index.html'"><i class="fa-solid fa-house"></i> Dashboard</li>
+        <li class="nav-item" data-nav-path="/MyRecords.html" onclick="location.href='MyRecords.html'"><i class="fa-solid fa-file-lines"></i> My Records</li>
+        <li class="nav-item" data-nav-path="/notifications.html" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i> Announcements</li>
+        <li class="nav-item" data-nav-path="/profile.html" onclick="location.href='profile.html'"><i class="fa-solid fa-user"></i> Profile</li>
+        <li class="nav-item" data-nav-path="/faq.html" onclick="location.href='faq.html'"><i class="fa-solid fa-circle-question"></i> FAQ</li>
+      </ul>
+
+    </aside>
+
+    <main class="main">
+
+      <header>
+        <h1>My Detailed Report History</h1>
+        <div class="user-info">
+          <div class="avatar" id="userAvatar">--</div>
+          <div>
+            <div><strong id="userName">Loading...</strong></div>
+            <div class="role-label">Student</div>
+          </div>
+          <button class="logout-btn" id="logoutBtn" title="Log out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </header>
+
+      <div id="reportsWarningBanner" class="reports-warning-banner"></div>
+
+      <div class="filters">
+        <select class="filter-select" id="statusFilter">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Date Submitted</th>
+              <th>Building</th>
+              <th>Location</th>
+              <th>Issue Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="reportsTable">
+            <tr>
+              <td colspan="5" class="empty-state">
+                <p>Loading reports...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button id="prevBtn" disabled>← Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button id="nextBtn" disabled>Next →</button>
+      </div>
+
+    </main>
+  </div>
+
+    <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module" src="/js/student-init.js"></script>
+    <script type="module">
+    import { logOut, getStudentProfile } from './js/auth.js';
+    import { requireAuth } from './js/auth/auth-guard.js';
+    import { FIREBASE_PROJECT_ID } from './js/firebase-config.js';
+    import { ROLES } from './js/config/app-constants.js';
+    import { getStudentReportsPaged } from './js/reports/reports-service.js';
+    import { FIELD, STATUS, toIssueTypeLabel } from './js/reports/reports-schema.js';
+    import { formatTimestampManila } from './js/timezone.js';
+    import { initHydroLightbox } from './js/ui/lightbox.js';
+    import { logError, logInfo } from './js/shared/logger.js';
+
+    const REPORTS_ERROR_MESSAGE = 'Unable to load reports right now. Please check your connection and try again.';
+
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const reportsTable = document.getElementById('reportsTable');
+    const statusFilter = document.getElementById('statusFilter');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageInfo = document.getElementById('pageInfo');
+    const reportsWarningBanner = document.getElementById('reportsWarningBanner');
+
+    let currentUid = null;
+    let currentPage = 1;
+    let hasMoreForCurrentPage = false;
+    let pageCursors = [null];
+
+    function showReportsMessage(message) {
+      reportsTable.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            <p>${message}</p>
+          </td>
+        </tr>
+      `;
+    }
+
+    function setWarningBanner(message = '') {
+      if (!reportsWarningBanner) return;
+      if (!message) {
+        reportsWarningBanner.textContent = '';
+        reportsWarningBanner.classList.remove('is-visible');
+        return;
+      }
+      reportsWarningBanner.textContent = message;
+      reportsWarningBanner.classList.add('is-visible');
+    }
+
+    function getInitials(name) {
+      const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return 'S';
+      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+
+    function formatDate(value) {
+      const date = value instanceof Date ? value : new Date(value);
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '-';
+      return formatTimestampManila(date, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: undefined,
+        minute: undefined,
+      });
+    }
+
+    function getStatusBadge(status) {
+      if (status === STATUS.RESOLVED) {
+        return '<span class="status status-resolved"><i class="fa-solid fa-circle-check"></i> Resolved</span>';
+      }
+      if (status === STATUS.IN_PROGRESS) {
+        return '<span class="status status-progress"><i class="fa-solid fa-screwdriver-wrench"></i> In Progress</span>';
+      }
+      return '<span class="status status-pending"><i class="fa-solid fa-clock"></i> Pending</span>';
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value == null ? '' : String(value);
+      return div.innerHTML;
+    }
+
+    function formatBuildingLabel(report) {
+      const building = String(report?.[FIELD.BUILDING] || '').trim();
+      const floor = String(report?.[FIELD.FLOOR] || '').trim();
+      if (!building) return '-';
+      return `${building}${floor ? `, ${floor}` : ''}`;
+    }
+
+    function renderReports(reports) {
+      if (!Array.isArray(reports) || reports.length === 0) {
+        showReportsMessage('No reports found');
+        return;
+      }
+
+      reportsTable.innerHTML = reports.map((report) => `
+        <tr>
+          <td>${formatDate(report[FIELD.CREATED_AT])}</td>
+          <td>${escapeHtml(formatBuildingLabel(report))}</td>
+          <td>${escapeHtml(report[FIELD.LOCATION] || '-')}</td>
+          <td>${escapeHtml(report[FIELD.ISSUE_TYPE] ? toIssueTypeLabel(report[FIELD.ISSUE_TYPE]) : '-')}</td>
+          <td>${getStatusBadge(report[FIELD.STATUS])}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadUserInfo(user) {
+      const profile = await getStudentProfile();
+      const displayName = profile?.name || user.displayName || user.email?.split('@')[0] || 'Student';
+      const avatarUrl = profile?.avatarUrl || user.photoURL;
+
+      userName.textContent = displayName;
+      if (avatarUrl) {
+        userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="profile-${user.uid}" onerror="this.parentElement.textContent='${getInitials(displayName)}'; this.remove();">`;
+      } else {
+        userAvatar.textContent = getInitials(displayName);
+      }
+    }
+
+    async function loadReports(reset = false) {
+      if (!currentUid) return;
+
+      if (reset) {
+        currentPage = 1;
+        hasMoreForCurrentPage = false;
+        pageCursors = [null];
+      }
+
+      const activeCursor = pageCursors[currentPage - 1] || null;
+      const status = statusFilter.value || '';
+      const result = await getStudentReportsPaged(currentUid, {
+        status,
+        pageSize: 10,
+        cursor: activeCursor,
+      });
+
+      if (!result.success) {
+        showReportsMessage(result.error || REPORTS_ERROR_MESSAGE);
+        hasMoreForCurrentPage = false;
+        setWarningBanner(result.error || '');
+      } else {
+        renderReports(result.reports);
+        hasMoreForCurrentPage = result.hasMore;
+        pageCursors[currentPage] = result.nextCursor;
+        setWarningBanner(result.warning || '');
+      }
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = !hasMoreForCurrentPage;
+      pageInfo.textContent = `Page ${currentPage}`;
+    }
+
+    statusFilter.addEventListener('change', () => {
+      loadReports(true).catch((error) => {
+        logError('Failed to reload filtered reports:', error);
+        showReportsMessage(REPORTS_ERROR_MESSAGE);
+        setWarningBanner(REPORTS_ERROR_MESSAGE);
+      });
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentPage <= 1) return;
+      currentPage -= 1;
+      loadReports(false).catch((error) => {
+        logError('Failed to load previous page:', error);
+        showReportsMessage(REPORTS_ERROR_MESSAGE);
+        setWarningBanner(REPORTS_ERROR_MESSAGE);
+      });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (!hasMoreForCurrentPage) return;
+      currentPage += 1;
+      loadReports(false).catch((error) => {
+        logError('Failed to load next page:', error);
+        showReportsMessage(REPORTS_ERROR_MESSAGE);
+        setWarningBanner(REPORTS_ERROR_MESSAGE);
+      });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      logOut();
+    });
+
+    window.addEventListener('hydro:report-submitted', async (event) => {
+      const detail = event.detail || {};
+      if (!currentUid || detail.uid !== currentUid) return;
+      await loadReports(true);
+    });
+
+    async function bootstrap() {
+      showReportsMessage('Loading reports...');
+      setWarningBanner('');
+      let shouldHideLoadingOverlay = true;
+
+      try {
+        const authState = await requireAuth({
+          allowedRoles: [ROLES.STUDENT],
+          loaderMessage: 'Loading records...',
+        });
+        const user = authState.user;
+
+        currentUid = user.uid;
+        logInfo(`[page] my-records uid=${currentUid} project=${FIREBASE_PROJECT_ID}`);
+
+        await loadUserInfo(user);
+        initHydroLightbox();
+        await loadReports(true);
+      } catch (error) {
+        if (error?.message !== 'redirect') {
+          logError('MyRecords bootstrap error:', error);
+          showReportsMessage(REPORTS_ERROR_MESSAGE);
+          setWarningBanner(REPORTS_ERROR_MESSAGE);
+        } else {
+          shouldHideLoadingOverlay = false;
+        }
+      } finally {
+        if (shouldHideLoadingOverlay) {
+          loadingOverlay.classList.add('hidden');
+        }
+      }
+    }
+
+    bootstrap();
+  </script>
+
+</body>
+
+</html>
+ 
+
+
+
+
+

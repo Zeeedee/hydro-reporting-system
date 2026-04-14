@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Dashboard</title>
+    <meta name="description" content="HYDRO Admin Dashboard - Water Safety Management">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+    <style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .notification-btn {
+            font-size: 1.2rem;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            background: none;
+            border: none;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 0.7rem;
+            line-height: 18px;
+            text-align: center;
+            padding: 0 4px;
+            display: none;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .stat-card.yellow {
+            background: linear-gradient(135deg, var(--yellow) 0%, #d97706 100%);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+        }
+
+        .stat-card.cyan {
+            background: linear-gradient(135deg, var(--cyan) 0%, #0891b2 100%);
+        }
+
+        .stat-card.red {
+            background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+.status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.in_progress {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .status-badge.resolved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item active">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="reports.html" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                Report Management
+            </a>
+            <a href="announcements.html" class="nav-item">
+                <i class="fas fa-bullhorn"></i>
+                Announcements
+            </a>
+            <a href="users.html" class="nav-item" id="usersNavItem">
+                <i class="fas fa-users"></i>
+                Users
+            </a>
+            <a href="locations.html" class="nav-item">
+                <i class="fas fa-map-marker-alt"></i>
+                Locations
+            </a>
+            <a href="analytics.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                Report & Analytics
+            </a>
+            <a href="audit-logs.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                Audit Logs
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">Dashboard</h1>
+            <div class="header-actions">
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">--</div>
+                    <div class="user-meta">
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="role-label">Admin</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                <button class="notification-btn" id="announcementBell" title="Announcements">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="announcementBadge">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card yellow">
+                    <div class="stat-title">Total Reports Received</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-sub" id="statTotalSub" style="margin-top:0.35rem; font-size:0.85rem; opacity:0.92;"></div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-title">Open Reports</div>
+                    <div class="stat-value" id="statPending">0</div>
+                    <div class="stat-sub" id="statPendingSub" style="margin-top:0.35rem; font-size:0.85rem; opacity:0.92;"></div>
+                </div>
+                <div class="stat-card cyan">
+                    <div class="stat-title">Completed Reports</div>
+                    <div class="stat-value" id="statResolved">0</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-title">Avg Resolution (hrs)</div>
+                    <div class="stat-value" id="statUrgent">-</div>
+                    <div class="stat-sub" id="statUrgentSub" style="margin-top:0.35rem; font-size:0.85rem; opacity:0.92;"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3 class="chart-title">Report Submission Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Most Reported Buildings</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+</div>
+    </main>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+  
+<script type="module">
+        import { initAdminAuthGuard, adminLogout, isSuperAdmin } from '../js/admin-auth.js';
+        import { getDashboardStats } from '../js/admin.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { ROUTES } from '../js/config/app-constants.js';
+        import { initHydroLightbox } from '../js/ui/lightbox.js';
+        import { handleRateLimitError } from '../js/shared/rate-limit-ui.js';
+        import { logError, logWarn } from '../js/shared/logger.js';
+
+        const functions = getFunctions(undefined, 'asia-southeast1');
+
+        // Helper function to get initials from name
+        function getInitials(name) {
+            if (!name) return 'A';
+            const parts = name.trim().split(' ').filter(p => p.length > 0);
+            if (parts.length === 0) return 'A';
+            if (parts.length === 1) return parts[0][0].toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function ensureChartJsLoaded() {
+            if (window.Chart) return Promise.resolve(window.Chart);
+
+            return new Promise((resolve, reject) => {
+                const existing = document.querySelector('script[data-hydro-chartjs]');
+                if (existing) {
+                    existing.addEventListener('load', () => resolve(window.Chart));
+                    existing.addEventListener('error', () => reject(new Error('Chart.js failed to load')));
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                script.async = true;
+                script.dataset.hydroChartjs = '1';
+                script.onload = () => resolve(window.Chart);
+                script.onerror = () => reject(new Error('Chart.js failed to load'));
+                document.head.appendChild(script);
+            });
+        }
+
+        // Initialize
+        async function init() {
+            let shouldHideLoadingOverlay = true;
+            try {
+                // Auth guard - redirects if not admin
+                const user = await initAdminAuthGuard();
+
+                // Update UI with user info
+                const displayName = user.name || user.email;
+                const avatarUrl = user.avatarUrl;
+
+                document.getElementById('userName').textContent = displayName;
+
+                // Display photo if available, otherwise show initials
+                const userAvatar = document.getElementById('userAvatar');
+                if (avatarUrl) {
+                    const group = `profile-${user.uid || ''}`;
+                    userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="${group}" onerror="this.parentElement.textContent='${getInitials(displayName)}'; this.remove();">`;
+                    initHydroLightbox();
+                } else {
+                    userAvatar.textContent = getInitials(displayName);
+                }
+
+                // Hide users nav if not super admin
+                if (!isSuperAdmin(user.role)) {
+                    document.getElementById('usersNavItem').style.display = 'none';
+                }
+
+                // Load dashboard data
+                await loadDashboardData();
+
+                // Hide loading
+                document.getElementById('loadingOverlay').classList.add('hidden');
+
+            } catch (error) {
+                logError('Initialization error:', error);
+                if (error.message === 'redirect') {
+                    shouldHideLoadingOverlay = false;
+                }
+
+                // Only show error UI if not a redirect (redirect errors are expected)
+                if (error.message !== 'redirect') {
+                    showErrorState(error.message || 'Failed to load dashboard. Please try again.');
+                }
+            } finally {
+                if (shouldHideLoadingOverlay) {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+        }
+
+        // Show error state in the dashboard content area
+        function showErrorState(message) {
+            const content = document.querySelector('.dashboard-content');
+            if (content) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h2 style="color: #1e293b; margin-bottom: 0.5rem;">Unable to Load Dashboard</h2>
+                        <p style="color: #64748b; margin-bottom: 1.5rem;">${message}</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="location.reload()" style="padding: 0.75rem 1.5rem; background: #1a5f7a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                                <i class="fas fa-refresh" style="margin-right: 0.5rem;"></i>Refresh Page
+                            </button>
+                            <a href="/login.html" style="padding: 0.75rem 1.5rem; background: #e2e8f0; color: #1e293b; text-decoration: none; border-radius: 8px; font-weight: 500;">
+                                Return to Sign In
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Fetch stats
+                const data = await getDashboardStats();
+
+                // Update stat cards
+                document.getElementById('statTotal').textContent = data.stats.totalReports || 0;
+                document.getElementById('statPending').textContent = (data.stats.openReports || 0) + (data.stats.inProgressReports || 0);
+                document.getElementById('statResolved').textContent = data.stats.completedReports || 0;
+
+                const totalSub = document.getElementById('statTotalSub');
+                if (totalSub) {
+                    const urgentHigh = Number(data.stats.urgentHighReports || 0);
+                    totalSub.textContent = urgentHigh > 0 ? `${urgentHigh} urgent/high risk` : '';
+                }
+
+                const pendingSub = document.getElementById('statPendingSub');
+                if (pendingSub) {
+                    const inProgress = Number(data.stats.inProgressReports || 0);
+                    const recurring = Array.isArray(data.recurringContaminationAreas) ? data.recurringContaminationAreas.length : 0;
+                    pendingSub.textContent = `${inProgress} in progress${recurring ? ` · ${recurring} recurring contamination areas (90d)` : ''}`;
+                }
+
+                const res = data.resolutionTime || {};
+                const avg = typeof res.currentAvgHours === 'number' ? res.currentAvgHours : null;
+                document.getElementById('statUrgent').textContent = avg === null ? '-' : String(avg);
+
+                const urgentSub = document.getElementById('statUrgentSub');
+                if (urgentSub) {
+                    const prev = typeof res.previousAvgHours === 'number' ? res.previousAvgHours : null;
+                    const delta = typeof res.deltaPct === 'number' ? res.deltaPct : null;
+                    const best = res.bestMonth && typeof res.bestAvgHours === 'number' ? `${res.bestMonth}: ${res.bestAvgHours}h` : '';
+
+                    const parts = [];
+                    if (prev !== null && res.previousMonthKey) parts.push(`Prev (${res.previousMonthKey}): ${prev}h`);
+                    if (delta !== null) parts.push(`Delta: ${delta > 0 ? '+' : ''}${delta}%`);
+                    if (best) parts.push(`Best: ${best}`);
+                    urgentSub.textContent = parts.join(' · ');
+                }
+
+                // Render charts
+                try {
+                    await ensureChartJsLoaded();
+                    renderTrendsChart(data.monthlyTrends || {});
+                    renderCategoryChart(data.buildingDistribution || {});
+                } catch (error) {
+                    logWarn('Chart.js unavailable, skipping charts:', error);
+                }
+            } catch (error) {
+                logError('Error loading dashboard data:', error);
+            }
+        }
+
+        async function refreshAnnouncementBadge() {
+            try {
+                const callable = httpsCallable(functions, 'getUnreadAnnouncementsCount');
+                const result = await callable();
+                const unreadCount = Number(result.data?.unreadCount || 0);
+                const badge = document.getElementById('announcementBadge');
+                if (!badge) return;
+                badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+            } catch (error) {
+                logError('Failed to load announcement unread count:', error);
+                handleRateLimitError(error);
+            }
+        }
+
+        function renderTrendsChart(monthlyData) {
+            if (!window.Chart) return;
+            const ctx = document.getElementById('trendsChart').getContext('2d');
+            const labels = Object.keys(monthlyData).sort();
+            const values = labels.map(l => monthlyData[l]);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length ? labels : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Reports',
+                        data: values.length ? values : [0, 0, 0, 0, 0, 0],
+                        borderColor: '#0891b2',
+                        backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function renderCategoryChart(categories) {
+            if (!window.Chart) return;
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const labels = Object.keys(categories);
+            const values = Object.values(categories);
+
+            const colors = ['#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length ? labels : ['No Data'],
+                    datasets: [{
+                        data: values.length ? values : [1],
+                        backgroundColor: labels.length ? colors.slice(0, labels.length) : ['#e2e8f0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 12, padding: 15 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+        const announcementBell = document.getElementById('announcementBell');
+        if (announcementBell) {
+            announcementBell.addEventListener('click', () => {
+                window.location.href = ROUTES.ADMIN_ANNOUNCEMENTS;
+            });
+        }
+
+        // Initialize on load
+        init().then(() => refreshAnnouncementBadge());
+    </script>
+</body>
+
+</html> 
+
+
+
+

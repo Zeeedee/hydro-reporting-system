@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Report Details</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        /* Sidebar - same as other pages */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-back:hover {
+            color: var(--primary);
+        }
+
+        .page-content {
+            padding: 2rem;
+        }
+
+        /* Report Header Bar */
+        .report-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .report-header-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .report-header-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-header-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .report-header-value.id {
+            color: var(--primary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.in_progress {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .status-badge.resolved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-badge.urgent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-badge.low {
+            background: var(--gray-light);
+            color: var(--gray);
+        }
+
+        .priority-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .priority-badge.high {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Three Column Layout */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .detail-card.issue {
+            background: #fef3c7;
+        }
+
+        .detail-card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-card-title i {
+            font-size: 0.85rem;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            font-size: 0.95rem;
+        }
+
+        /* Photos Section */
+        .photos-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .photo-item {
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .photo-item img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Reporter Info */
+        .reporter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .reporter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        /* Admin Actions */
+        .actions-card {
+            background: white;
+        }
+
+        .actions-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-panel {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .task-item {
+            border: 1px solid var(--gray-light);
+            border-radius: 12px;
+            padding: 0.9rem;
+            background: #fff;
+        }
+
+        .task-item-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.65rem;
+        }
+
+        .task-item-title {
+            font-weight: 800;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .task-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            border: 1px solid var(--gray-light);
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .task-pill.assigned { background: #fef3c7; color: #92400e; border-color: rgba(146, 64, 14, 0.18); }
+        .task-pill.accepted { background: #dbeafe; color: #1d4ed8; border-color: rgba(29, 78, 216, 0.18); }
+        .task-pill.in_progress { background: #cffafe; color: #0e7490; border-color: rgba(14, 116, 144, 0.18); }
+        .task-pill.completed { background: #d1fae5; color: #047857; border-color: rgba(4, 120, 87, 0.18); }
+        .task-pill.expired { background: #fee2e2; color: #b91c1c; border-color: rgba(185, 28, 28, 0.18); }
+        .task-pill.closed_by_team { background: #f1f5f9; color: #475569; border-color: rgba(100, 116, 139, 0.2); }
+
+        .task-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+        }
+
+        .task-meta .detail-item {
+            margin-bottom: 0;
+        }
+
+        .task-notes {
+            margin-top: 0.85rem;
+            padding-top: 0.85rem;
+            border-top: 1px dashed rgba(148, 163, 184, 0.55);
+        }
+
+        .task-notes pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.85rem;
+            color: #0f172a;
+            background: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 10px;
+            padding: 0.7rem 0.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+            color: var(--text);
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-assign {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--cyan);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .btn-assign:hover {
+            background: #0891b2;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Staff List */
+        .staff-search {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .staff-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .staff-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+            margin-bottom: 0.5rem;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .staff-item:hover {
+            background: var(--light);
+        }
+
+        .staff-item.selected {
+            border-color: var(--cyan);
+            background: #ecfeff;
+        }
+
+        .staff-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-light);
+            object-fit: cover;
+        }
+
+        .staff-info {
+            flex: 1;
+        }
+
+        .staff-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .staff-role {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .staff-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .staff-status.available {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .staff-status.busy {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .datetime-row {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .datetime-row>div {
+            flex: 1;
+        }
+
+        /* Success Overlay */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .success-overlay.hidden {
+            display: none;
+        }
+
+        .success-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--green);
+            margin-bottom: 1rem;
+        }
+
+        .success-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        @media (max-width: 1024px) {
+            .details-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .actions-card {
+                grid-column: 1 / -1;
+            }
+
+            .actions-layout {
+                display: grid;
+                grid-template-columns: 1.05fr 0.95fr;
+                gap: 1.25rem;
+                align-items: start;
+            }
+
+            .task-panel {
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+                padding-left: 1.25rem;
+                border-left: 1px solid var(--gray-light);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reporter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .task-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        @keyframes loadingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="success-overlay hidden" id="successOverlay">
+        <div class="success-content">
+            <i class="fas fa-check-circle success-icon"></i>
+            <div class="success-text">Successful!</div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item active"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <a href="reports.html" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Reports
+            </a>
+            <h1 class="header-title" id="reportTitle">Report Details</h1>
+        </header>
+
+        <div class="page-content">
+            <!-- Report Header Bar -->
+            <div class="report-header">
+                <div class="report-header-item">
+                    <span class="report-header-label">Report ID</span>
+                    <span class="report-header-value id" id="reportId">#----</span>
+                </div>
+                <div class="report-header-item">
+                    <span class="report-header-label">Date Submitted</span>
+                    <span class="report-header-value" id="reportDate">--/--/----</span>
+                </div>
+                <div class="report-header-item">
+                    <span class="report-header-label">Current Status</span>
+                    <span class="status-badge pending" id="reportStatus">Pending</span>
+                </div>
+                <div class="report-header-item">
+                    <span class="report-header-label">Priority Level</span>
+                    <span class="priority-badge low" id="reportPriority">Low</span>
+                </div>
+            </div>
+
+            <!-- Three Column Layout -->
+            <div class="details-grid">
+                <!-- Issue Information -->
+                <div class="detail-card issue">
+                    <h3 class="detail-card-title"><i class="fas fa-exclamation-triangle"></i> Issue Information</h3>
+                    <div class="detail-item">
+                        <div class="detail-label">Issue Type</div>
+                        <div class="detail-value" id="issueType">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value" id="issueDescription">--</div>
+                    </div>
+                </div>
+
+                <!-- Location Details -->
+                <div class="detail-card">
+                    <h3 class="detail-card-title"><i class="fas fa-map-marker-alt"></i> Location Details</h3>
+                    <div class="detail-item">
+                        <div class="detail-label">Building</div>
+                        <div class="detail-value" id="locationBuilding">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Floor</div>
+                        <div class="detail-value" id="locationFloor">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Area</div>
+                        <div class="detail-value" id="locationArea">--</div>
+                    </div>
+                </div>
+
+                <!-- Admin Actions -->
+                <div class="detail-card actions-card">
+                    <h3 class="detail-card-title"><i class="fas fa-cogs"></i> Admin Actions</h3>
+                    <div class="actions-layout">
+                        <form id="actionsForm">
+                            <div class="form-group">
+                                <label class="form-label">Update Status</label>
+                                <select class="form-select" id="actionStatus">
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Set Priority</label>
+                                <select class="form-select" id="actionPriority">
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Add Remarks / Action Notes</label>
+                                <textarea class="form-textarea" id="actionNotes" placeholder="Enter notes..."></textarea>
+                            </div>
+                            <button type="button" class="btn-assign" id="assignBtn">
+                                <i class="fas fa-user-plus"></i> Assign to Staff
+                            </button>
+                            <div id="assignBlockedMsg" style="display:none; margin-top:0.6rem; padding:0.65rem 0.75rem; border-radius:10px; background:#fffbeb; border:1px solid #fcd34d; color:#92400e; font-weight:700;">
+                                <i class="fa-solid fa-circle-xmark" style="margin-right:0.5rem;"></i>
+                                Cannot assign staff to a resolved report.
+                            </div>
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                        </form>
+
+                        <div class="task-panel">
+                            <h3 class="detail-card-title" style="margin-bottom:0.75rem;"><i class="fas fa-stopwatch"></i> Tasks</h3>
+                            <div id="taskLifecycleEmpty" style="color: var(--gray);">No task assigned yet.</div>
+                            <div id="taskLifecycleList" class="task-list" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photos Section -->
+            <div class="photos-section">
+                <h3 class="detail-card-title"><i class="fas fa-camera"></i> Uploaded Photos</h3>
+                <div class="photos-grid" id="photosGrid">
+                    <p style="color: var(--gray);">No photos uploaded</p>
+                </div>
+            </div>
+
+            <!-- Reporter Information -->
+            <div class="reporter-section">
+                <h3 class="detail-card-title"><i class="fas fa-user"></i> Reporter Information</h3>
+                <div class="reporter-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value" id="reporterName">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value" id="reporterEmail">--</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Contact</div>
+                        <div class="detail-value" id="reporterContact">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Assign Task Modal -->
+    <div class="modal-overlay hidden" id="assignModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Assign Task</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="staff-search" id="staffSearch" placeholder="Search staff...">
+                <div style="margin:-0.25rem 0 0.75rem; color: var(--gray); font-weight:700; font-size:0.8rem;">
+                    Select one or more staff members.
+                    <span id="selectedStaffCount" style="margin-left:0.35rem;"></span>
+                </div>
+
+                <div class="staff-list" id="staffList">
+                    <!-- Staff items will be loaded here -->
+                </div>
+
+                <div class="datetime-row">
+                    <div>
+                        <label class="form-label">Expected Resolution Date</label>
+                        <input type="date" class="form-select" id="resolutionDate">
+                    </div>
+                    <div>
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-select" id="resolutionTime">
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="confirmAssignBtn">
+                    <i class="fas fa-check"></i> Assign Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard } from '../js/admin-auth.js';
+        import { updateReportStatus, assignTask, getMaintenanceStaff } from '../js/admin.js';
+        import { db } from '../js/firebase-config.js';
+        import { doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { normalizeRiskLevel, toIssueTypeLabel, toRiskLevelLabel } from '../js/reports/reports-schema.js';
+        import { validateEnum, validateLength, firstValidationError } from '../js/validation/validation.js';
+        import { COLLECTIONS } from '../js/config/app-constants.js';
+        import { formatTimestampManila } from '../js/timezone.js';
+        import { initHydroLightbox } from '../js/ui/lightbox.js';
+        import { handleRateLimitError } from '../js/shared/rate-limit-ui.js';
+        import { showToast } from '../js/ui/notice.js';
+        import { logError } from '../js/shared/logger.js';
+
+        let reportData = null;
+        let tasksData = [];
+        let selectedStaffIds = [];
+        let staffList = [];
+        const functions = getFunctions(undefined, 'asia-southeast1');
+        const syncReportPhotosFromStorage = httpsCallable(functions, 'syncReportPhotosFromStorage');
+
+        async function loadReporterInfo() {
+            const r = reportData || {};
+
+            const snap = r.reporterSnapshot && typeof r.reporterSnapshot === 'object' ? r.reporterSnapshot : null;
+            const snapshotName = String(snap?.name || '').trim();
+            const snapshotEmail = String(snap?.email || '').trim();
+            const snapshotPhone = String(snap?.phoneNumber || '').trim();
+
+            if (snapshotName || snapshotEmail || snapshotPhone) {
+                document.getElementById('reporterName').textContent = snapshotName || 'Reporter profile missing';
+                document.getElementById('reporterEmail').textContent = snapshotEmail || 'Email unavailable';
+                document.getElementById('reporterContact').textContent = snapshotPhone || 'Phone unavailable';
+                const nameEl = document.getElementById('reporterName');
+                const emailEl = document.getElementById('reporterEmail');
+                const phoneEl = document.getElementById('reporterContact');
+                if (nameEl) nameEl.dataset.loaded = '1';
+                if (emailEl) emailEl.dataset.loaded = '1';
+                if (phoneEl) phoneEl.dataset.loaded = '1';
+                return;
+            }
+
+            const uid = String(r.studentId || '').trim();
+            if (!uid) {
+                document.getElementById('reporterName').textContent = 'Reporter profile missing';
+                document.getElementById('reporterEmail').textContent = 'Email unavailable';
+                document.getElementById('reporterContact').textContent = 'Phone unavailable';
+                const nameEl = document.getElementById('reporterName');
+                const emailEl = document.getElementById('reporterEmail');
+                const phoneEl = document.getElementById('reporterContact');
+                if (nameEl) nameEl.dataset.loaded = '1';
+                if (emailEl) emailEl.dataset.loaded = '1';
+                if (phoneEl) phoneEl.dataset.loaded = '1';
+                return;
+            }
+
+            // Do not clear reporter fields during re-renders; only show loading on first join.
+            const nameEl = document.getElementById('reporterName');
+            const emailEl = document.getElementById('reporterEmail');
+            const phoneEl = document.getElementById('reporterContact');
+            const alreadyLoaded = (nameEl && nameEl.dataset.loaded === '1') || (emailEl && emailEl.dataset.loaded === '1');
+            if (!alreadyLoaded) {
+                if (nameEl) nameEl.textContent = 'Loading...';
+                if (emailEl) emailEl.textContent = 'Loading...';
+                if (phoneEl) phoneEl.textContent = 'Loading...';
+            }
+
+            try {
+                const userSnap = await getDoc(doc(db, COLLECTIONS.USERS, uid));
+                if (!userSnap.exists()) {
+                    document.getElementById('reporterName').textContent = 'Reporter profile missing';
+                    document.getElementById('reporterEmail').textContent = 'Email unavailable';
+                    document.getElementById('reporterContact').textContent = 'Phone unavailable';
+                    if (nameEl) nameEl.dataset.loaded = '1';
+                    if (emailEl) emailEl.dataset.loaded = '1';
+                    if (phoneEl) phoneEl.dataset.loaded = '1';
+                    return;
+                }
+                const user = userSnap.data() || {};
+                const name = String(user.name || '').trim();
+                const email = String(user.email || '').trim();
+                const phone = String(user.phone || '').trim();
+                document.getElementById('reporterName').textContent = name || 'Reporter profile missing';
+                document.getElementById('reporterEmail').textContent = email || 'Email unavailable';
+                document.getElementById('reporterContact').textContent = phone || 'Phone unavailable';
+                if (nameEl) nameEl.dataset.loaded = '1';
+                if (emailEl) emailEl.dataset.loaded = '1';
+                if (phoneEl) phoneEl.dataset.loaded = '1';
+            } catch (error) {
+                logError('Reporter join failed:', error);
+                document.getElementById('reporterName').textContent = 'Reporter profile missing';
+                document.getElementById('reporterEmail').textContent = 'Email unavailable';
+                document.getElementById('reporterContact').textContent = 'Phone unavailable';
+                if (nameEl) nameEl.dataset.loaded = '1';
+                if (emailEl) emailEl.dataset.loaded = '1';
+                if (phoneEl) phoneEl.dataset.loaded = '1';
+            }
+        }
+
+        function toDate(value) {
+            if (!value) return null;
+            if (typeof value.toDate === 'function') return value.toDate();
+            if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+            const parsed = new Date(value);
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function formatDuration(seconds) {
+            const s = Number(seconds);
+            if (!Number.isFinite(s) || s < 0) return '--';
+            const hrs = Math.floor(s / 3600);
+            const mins = Math.floor((s % 3600) / 60);
+            const rem = Math.floor(s % 60);
+            if (hrs > 0) return `${hrs}h ${mins}m ${rem}s`;
+            if (mins > 0) return `${mins}m ${rem}s`;
+            return `${rem}s`;
+        }
+
+        function normalizeTaskStatus(raw) {
+            const value = String(raw || '').trim();
+            if (value === 'pending') return 'assigned';
+            if (value === 'done') return 'completed';
+            return value || '--';
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = String(value == null ? '' : value);
+            return div.innerHTML;
+        }
+
+        function shortId(value) {
+            const raw = String(value || '').trim();
+            return raw ? raw.substring(0, 8).toUpperCase() : '--------';
+        }
+
+        function staffLabel(uid) {
+            const id = String(uid || '').trim();
+            if (!id) return 'Unassigned';
+            const found = Array.isArray(staffList) ? staffList.find((s) => String(s?.id || '').trim() === id) : null;
+            const name = String(found?.name || '').trim();
+            return name ? name : `${id.substring(0, 6).toUpperCase()}...`;
+        }
+
+        function formatWhen(value) {
+            const dt = toDate(value);
+            return dt ? formatTimestampManila(dt, { hour: undefined, minute: undefined }) : '--';
+        }
+
+        function renderTaskLifecycleList() {
+            const empty = document.getElementById('taskLifecycleEmpty');
+            const list = document.getElementById('taskLifecycleList');
+            if (!empty || !list) return;
+
+            const safeTasks = Array.isArray(tasksData) ? tasksData : [];
+            if (!safeTasks.length) {
+                empty.style.display = 'block';
+                list.style.display = 'none';
+                list.innerHTML = '';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.style.display = 'flex';
+
+            list.innerHTML = safeTasks.map((t) => {
+                const status = normalizeTaskStatus(t.status);
+                const statusLabel = String(status || '--').replace(/_/g, ' ');
+                const assigneeUid = String(t.assignedTo || '').trim();
+                const performer = String(t.performedByName || t.performedByEmail || t.performedByUid || '').trim();
+
+                const assignedAt = formatWhen(t.assignedAt);
+                const acceptBy = formatWhen(t.acceptBy);
+                const acceptedAt = formatWhen(t.acceptedAt);
+                const startedAt = formatWhen(t.startedAt);
+                const completedAt = formatWhen(t.completedAt);
+                const closedAt = formatWhen(t.closedAt);
+
+                const duration = typeof t.durationSeconds === 'number'
+                    ? formatDuration(t.durationSeconds)
+                    : '--';
+
+                const notes = String(t.completionNotes || '').trim();
+                const closedReason = String(t.closedReason || '').trim();
+                const closedBy = String(t.closedByName || t.closedByEmail || t.closedByUid || '').trim();
+
+                const isCompleted = status === 'completed';
+                const isClosedByTeam = status === 'closed_by_team';
+
+                return `
+                    <div class="task-item">
+                        <div class="task-item-head">
+                            <div class="task-item-title">
+                                <span>Task #${escapeHtml(shortId(t.id))}</span>
+                                <span style="color:var(--gray); font-weight:700;">·</span>
+                                <span>${escapeHtml(staffLabel(assigneeUid))}</span>
+                            </div>
+                            <span class="task-pill ${escapeHtml(status)}">${escapeHtml(statusLabel)}</span>
+                        </div>
+                        <div class="task-meta">
+                            <div class="detail-item">
+                                <div class="detail-label">Priority</div>
+                                <div class="detail-value">${escapeHtml(String(t.priority || reportData?.riskLevel || '--'))}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Accept By</div>
+                                <div class="detail-value">${escapeHtml(acceptBy)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Assigned At</div>
+                                <div class="detail-value">${escapeHtml(assignedAt)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Accepted At</div>
+                                <div class="detail-value">${escapeHtml(acceptedAt)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Started At</div>
+                                <div class="detail-value">${escapeHtml(startedAt)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Completed / Closed At</div>
+                                <div class="detail-value">${escapeHtml(isClosedByTeam ? closedAt : completedAt)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value">${escapeHtml(duration)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Performed By</div>
+                                <div class="detail-value">${escapeHtml(performer || '--')}</div>
+                            </div>
+                        </div>
+
+                        ${isCompleted ? `
+                            <div class="task-notes">
+                                <div class="detail-label" style="margin-bottom:6px;">Work Report</div>
+                                <div class="detail-value" style="margin-bottom:10px; font-size:0.85rem; color:#475569;">
+                                    Submitted by ${escapeHtml(performer || '--')} at ${escapeHtml(completedAt)}
+                                </div>
+                                <pre>${escapeHtml(notes || 'No work report provided.')}</pre>
+                            </div>
+                        ` : ''}
+
+                        ${isClosedByTeam ? `
+                            <div class="task-notes">
+                                <div class="detail-label" style="margin-bottom:6px;">Closure</div>
+                                <div class="detail-value" style="font-size:0.9rem; color:#334155;">
+                                    Closed by team completion${closedBy ? ` (by ${escapeHtml(closedBy)})` : ''}${closedReason ? ` · ${escapeHtml(closedReason)}` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadTaskLifecycle(reportId) {
+            tasksData = [];
+            const normalized = String(reportId || '').trim();
+            if (!normalized) {
+                renderTaskLifecycleList();
+                return;
+            }
+
+            try {
+                const snap = await getDocs(query(collection(db, COLLECTIONS.TASKS), where('reportId', '==', normalized)));
+                tasksData = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+                tasksData.sort((a, b) => {
+                    const ad = toDate(a.assignedAt);
+                    const bd = toDate(b.assignedAt);
+                    const am = ad ? ad.getTime() : 0;
+                    const bm = bd ? bd.getTime() : 0;
+                    return bm - am;
+                });
+            } catch (error) {
+                logError('Task lifecycle load failed:', error);
+                tasksData = [];
+            }
+            renderTaskLifecycleList();
+        }
+
+        async function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            try {
+                await initAdminAuthGuard();
+
+                // Get report ID from URL
+                const params = new URLSearchParams(window.location.search);
+                const reportId = params.get('id');
+
+                if (!reportId) {
+                    window.location.href = 'reports.html';
+                    return;
+                }
+
+                await loadReport(reportId);
+                await loadStaffList();
+                setupEventListeners();
+            } catch (error) {
+                logError('Init error:', error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        async function loadReport(reportId) {
+            const reportDoc = await getDoc(doc(db, COLLECTIONS.REPORTS, reportId));
+
+            if (!reportDoc.exists()) {
+                showToast('We could not find that report.', { type: 'warning' });
+                window.location.href = 'reports.html';
+                return;
+            }
+
+            reportData = { id: reportDoc.id, ...reportDoc.data() };
+            renderReport();
+            await loadTaskLifecycle(reportData.id);
+            await loadReporterInfo();
+        }
+
+        function renderReport() {
+            const r = reportData;
+            const date = r.createdAt?.toDate?.() || new Date(r.createdAt?.seconds * 1000 || Date.now());
+
+            document.getElementById('reportId').textContent = '#' + r.id.substring(0, 8).toUpperCase();
+            document.getElementById('reportDate').textContent = formatTimestampManila(date, { hour: undefined, minute: undefined });
+
+            const statusEl = document.getElementById('reportStatus');
+            statusEl.textContent = (r.status || 'pending').replace('_', ' ');
+            statusEl.className = 'status-badge ' + (r.status || 'pending');
+
+            const priorityEl = document.getElementById('reportPriority');
+            const normalizedRisk = normalizeRiskLevel(r.riskLevel || 'low');
+            priorityEl.textContent = toRiskLevelLabel(normalizedRisk);
+            priorityEl.className = 'priority-badge ' + normalizedRisk;
+
+            document.getElementById('issueType').textContent = r.issueType ? toIssueTypeLabel(r.issueType) : 'N/A';
+            document.getElementById('issueDescription').textContent = r.description || 'No description provided';
+
+            document.getElementById('locationBuilding').textContent = r.building || 'N/A';
+            document.getElementById('locationFloor').textContent = r.floor || 'N/A';
+            document.getElementById('locationArea').textContent = r.area || r.location || 'N/A';
+
+            // Reporter info is resolved separately; avoid resetting to Loading on every render.
+
+            // Set form values
+            document.getElementById('actionStatus').value = r.status || 'pending';
+            document.getElementById('actionPriority').value = normalizeRiskLevel(r.riskLevel || 'low');
+
+            const resolved = String(r.status || '').trim() === 'resolved' || String(r.status || '').trim() === 'closed';
+            const assignBtn = document.getElementById('assignBtn');
+            const assignBlockedMsg = document.getElementById('assignBlockedMsg');
+            if (assignBtn) {
+                assignBtn.disabled = resolved;
+                assignBtn.title = resolved ? 'Cannot assign staff to a resolved report.' : '';
+            }
+            if (assignBlockedMsg) {
+                assignBlockedMsg.style.display = resolved ? 'block' : 'none';
+            }
+
+            // Photos
+            const photoList = Array.isArray(r.photoUrls) && r.photoUrls.length
+                ? r.photoUrls
+                : (r.photoUrl ? [r.photoUrl] : []);
+            if (photoList.length) {
+                const group = `report-${String(r.id || '').trim()}`;
+                document.getElementById('photosGrid').innerHTML = photoList.map((url) => `
+                    <div class="photo-item">
+                        <img
+                            src="${url}"
+                            alt="Report photo"
+                            loading="lazy"
+                            data-hydro-lightbox
+                            data-lightbox-src="${url}"
+                            data-lightbox-group="${group}"
+                        >
+                    </div>
+                `).join('');
+                initHydroLightbox();
+            } else {
+                document.getElementById('photosGrid').innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+                        <p style="color: var(--gray); margin:0;">No photos linked to this report.</p>
+                        <button type="button" class="btn-primary" id="linkPhotosBtn">
+                            <i class="fas fa-link"></i> Link uploaded photos
+                        </button>
+                    </div>
+                `;
+
+                const btn = document.getElementById('linkPhotosBtn');
+                if (btn) {
+                    btn.addEventListener('click', async () => {
+                        btn.disabled = true;
+                        const original = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Linking...';
+                        try {
+                            const result = await syncReportPhotosFromStorage({ reportId: String(r.id || '').trim() });
+                            const urls = result?.data?.photoUrls;
+                            const count = Array.isArray(urls) ? urls.length : 0;
+                            if (count > 0) {
+                                await loadReport(String(r.id));
+                                showToast(`Linked ${count} photo${count === 1 ? '' : 's'} from Storage.`, { type: 'success' });
+                            } else {
+                                showToast('No uploaded photos were found for this report yet.', { type: 'info' });
+                            }
+                        } catch (error) {
+                            logError('Link photos failed:', error);
+                            if (handleRateLimitError(error)) {
+                                return;
+                            }
+                            showToast('Could not link photos right now. Please try again.', { type: 'error' });
+                        } finally {
+                            btn.disabled = false;
+                            btn.innerHTML = original;
+                        }
+                    });
+                }
+            }
+        }
+
+        async function loadStaffList() {
+            try {
+                staffList = await getMaintenanceStaff();
+                renderStaffList(staffList);
+                renderTaskLifecycleList();
+            } catch (error) {
+                logError('Error loading staff:', error);
+            }
+        }
+
+        function renderStaffList(staff) {
+            const container = document.getElementById('staffList');
+            const countEl = document.getElementById('selectedStaffCount');
+            if (countEl) {
+                const count = Array.isArray(selectedStaffIds) ? selectedStaffIds.length : 0;
+                countEl.textContent = count ? `(${count} selected)` : '';
+            }
+
+            if (!staff.length) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray);">No maintenance staff found</p>';
+                return;
+            }
+
+            const selectedSet = new Set(Array.isArray(selectedStaffIds) ? selectedStaffIds : []);
+            container.innerHTML = staff.map(s => {
+                const isSelected = selectedSet.has(String(s.id || '').trim());
+                return `
+                <div class="staff-item ${isSelected ? 'selected' : ''}" data-id="${s.id}">
+                    <img src="${s.avatarUrl || '../assets/default-avatar.svg'}" class="staff-avatar" alt="${s.name}">
+                    <div class="staff-info">
+                        <div class="staff-name">${s.name}</div>
+                        <div class="staff-role">${s.department || 'Maintenance'} · ${s.phone || 'No phone'}</div>
+                    </div>
+                    <span class="staff-status ${s.availability}">${s.availability}</span>
+                </div>
+            `;
+            }).join('');
+
+            // Add click handlers
+            container.querySelectorAll('.staff-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = String(item.dataset.id || '').trim();
+                    if (!id) return;
+                    const set = new Set(Array.isArray(selectedStaffIds) ? selectedStaffIds : []);
+                    if (set.has(id)) {
+                        set.delete(id);
+                        item.classList.remove('selected');
+                    } else {
+                        set.add(id);
+                        item.classList.add('selected');
+                    }
+                    selectedStaffIds = Array.from(set);
+                    if (countEl) {
+                        const count = selectedStaffIds.length;
+                        countEl.textContent = count ? `(${count} selected)` : '';
+                    }
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Save changes
+            document.getElementById('actionsForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const status = document.getElementById('actionStatus').value;
+                const priority = document.getElementById('actionPriority').value;
+                const notes = document.getElementById('actionNotes').value;
+
+                const validationError = firstValidationError([
+                    validateEnum(status, ['pending', 'in_progress', 'resolved'], 'Status'),
+                    validateEnum(priority, ['low', 'medium', 'high', 'urgent'], 'Priority'),
+                    validateLength(notes, { max: 500, label: 'Notes' }),
+                ]);
+                if (validationError) {
+                    showError(validationError);
+                    return;
+                }
+
+                const saveBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = saveBtn.textContent;
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                try {
+                    await updateReportStatus(reportData.id, {
+                        status,
+                        riskLevel: priority,
+                        notes
+                    });
+
+                    // Update local state and re-render (no page reload!)
+                    reportData.status = status;
+                    reportData.riskLevel = priority;
+                    if (notes) reportData.notes = notes;
+
+                    showSuccess('Report updated successfully!');
+                    renderReport();
+                } catch (error) {
+                    logError('Error updating report:', error);
+                    showError('Failed to update report. Please try again.');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                }
+            });
+
+            // Open assign modal
+            document.getElementById('assignBtn').addEventListener('click', () => {
+                if (String(reportData?.status || '').trim() === 'resolved' || String(reportData?.status || '').trim() === 'closed') {
+                    showError('Cannot assign staff to a resolved report.');
+                    return;
+                }
+                selectedStaffIds = [];
+                renderStaffList(staffList);
+                document.getElementById('assignModal').classList.remove('hidden');
+            });
+
+            // Close modal
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('assignModal').classList.add('hidden');
+            });
+
+            // Staff search
+            document.getElementById('staffSearch').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = staffList.filter(s =>
+                    s.name.toLowerCase().includes(query) ||
+                    s.email.toLowerCase().includes(query)
+                );
+                renderStaffList(filtered);
+            });
+
+            // Confirm assign
+            document.getElementById('confirmAssignBtn').addEventListener('click', async () => {
+                const assignees = Array.isArray(selectedStaffIds) ? selectedStaffIds.map((v) => String(v || '').trim()).filter(Boolean) : [];
+                if (!assignees.length) {
+                    showToast('Please select at least one staff member to assign.', { type: 'warning' });
+                    return;
+                }
+
+                const date = document.getElementById('resolutionDate').value;
+                const time = document.getElementById('resolutionTime').value;
+                const expectedResolution = date && time ? new Date(`${date}T${time}`) : null;
+
+                const btn = document.getElementById('confirmAssignBtn');
+                btn.disabled = true;
+                btn.textContent = 'Assigning...';
+
+                try {
+                    const result = await assignTask(reportData.id, assignees, expectedResolution, '');
+                    document.getElementById('assignModal').classList.add('hidden');
+
+                    // Update local state
+                    reportData.status = 'in_progress';
+                    reportData.assignedTo = assignees[0];
+                    reportData.assignedToUids = assignees;
+                    if (result?.data?.taskId) reportData.taskId = result.data.taskId;
+                    if (Array.isArray(result?.data?.taskIds)) reportData.taskIds = result.data.taskIds;
+                    await loadTaskLifecycle(reportData.id);
+                    renderReport();
+                    document.getElementById('actionStatus').value = 'in_progress';
+
+                    showSuccess('Task assigned successfully!');
+                } catch (error) {
+                    logError('Error assigning task:', error);
+                    const message = String(error?.message || 'Failed to assign task. Please try again.');
+                    if (message.toLowerCase().includes('cannot assign') || String(error?.code || '').includes('failed-precondition')) {
+                        showError(message);
+                    } else {
+                        showError('Failed to assign task. Please try again.');
+                    }
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Assign Task';
+                }
+            });
+        }
+
+        function showSuccess(message) {
+            const overlay = document.getElementById('successOverlay');
+            overlay.querySelector('.success-text').textContent = message;
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                // NO page reload - UI already updated locally
+            }, 1500);
+        }
+
+        function showError(message) {
+            const text = String(message || '').trim();
+            showToast(text || 'Something went wrong. Please try again.', { type: 'error' });
+        }
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+

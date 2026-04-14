@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Announcements</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-create {
+            padding: 0.7rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-create:hover {
+            background: var(--primary-dark);
+        }
+
+        .search-box {
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            min-width: 250px;
+            font-size: 0.9rem;
+        }
+
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .announcement-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .announcement-header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .announcement-header.alert {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        }
+
+        .announcement-header.maintenance {
+            background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+        }
+
+        .announcement-header.general {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        }
+
+        .announcement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .announcement-icon.alert {
+            background: #dc2626;
+            color: white;
+        }
+
+        .announcement-icon.maintenance {
+            background: #0891b2;
+            color: white;
+        }
+
+        .announcement-icon.general {
+            background: #6366f1;
+            color: white;
+        }
+
+        .announcement-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .announcement-body {
+            padding: 1.5rem;
+        }
+
+        .announcement-message {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .announcement-meta {
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .announcement-actions {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gray-light);
+            background: white;
+        }
+
+        .btn-action:hover {
+            background: var(--light);
+        }
+
+        .btn-action.edit {
+            color: var(--primary);
+        }
+
+        .btn-action.archive {
+            color: var(--red);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-select,
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            padding: 0.8rem 1.5rem;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .announcements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        @keyframes loadingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item active"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1 class="header-title">Announcements</h1>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div class="toolbar">
+                <button class="btn-create" id="createBtn">
+                    <i class="fas fa-plus"></i> Create Announcement
+                </button>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search announcements...">
+            </div>
+
+            <div class="announcements-grid" id="announcementsGrid">
+                <!-- Announcements will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay hidden" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Create Announcement</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="announcementForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Announcement Type</label>
+                        <select class="form-select" id="annType">
+                            <option value="general">General</option>
+                            <option value="alert">Alert</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="update">Update</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-input" id="annTitle" required placeholder="Enter title...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" id="annMessage" required
+                            placeholder="Enter message..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Audience</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="audience" value="all" checked> All Users
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="audience" value="student"> Students
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="audience" value="admin"> Admin
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="audience" value="maintenance"> Maintenance
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-submit">Post Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard, adminLogout } from '../js/admin-auth.js';
+        import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncementByAdmin } from '../js/admin.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { validateRequired, validateLength, validateEnum, firstValidationError } from '../js/validation/validation.js';
+        import { formatTimestampManila } from '../js/timezone.js';
+        import { handleRateLimitError } from '../js/shared/rate-limit-ui.js';
+        import { showToast } from '../js/ui/notice.js';
+        import { logError } from '../js/shared/logger.js';
+
+        const functions = getFunctions(undefined, 'asia-southeast1');
+
+        let announcements = [];
+        let editingId = null;
+        let isPosting = false;
+
+        function toAudienceLabel(audience) {
+            const value = String(audience || 'all').trim();
+            if (value === 'all') return 'All Users';
+            if (value === 'student') return 'Students';
+            if (value === 'maintenance') return 'Maintenance';
+            if (value === 'super_admin') return 'Super Admins';
+            if (value === 'admin') return 'Admins';
+            return value;
+        }
+
+        function generateRequestId() {
+            try {
+                if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+                    return globalThis.crypto.randomUUID();
+                }
+            } catch (_) {
+                // ignore
+            }
+            return `${Date.now()}_${Math.random().toString(16).slice(2)}_${Math.random().toString(16).slice(2)}`;
+        }
+
+        async function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            try {
+                await initAdminAuthGuard();
+                const markSeen = httpsCallable(functions, 'markAnnouncementsSeen');
+                await markSeen();
+                await loadAnnouncements();
+                setupEventListeners();
+            } catch (error) {
+                logError('Init error:', error);
+                handleRateLimitError(error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        async function loadAnnouncements() {
+            try {
+                announcements = await getAnnouncements();
+                renderAnnouncements(announcements);
+            } catch (error) {
+                logError('Error loading announcements:', error);
+            }
+        }
+
+        function renderAnnouncements(items) {
+            const grid = document.getElementById('announcementsGrid');
+
+            if (!items.length) {
+                grid.innerHTML = '<p style="color: var(--gray); text-align: center; grid-column: 1/-1;">No announcements yet</p>';
+                return;
+            }
+
+                grid.innerHTML = items.filter(a => a.isActive !== false && a.isDeleted !== true).map(a => {
+                    const date = a.createdAt?.toDate?.() || new Date(a.createdAt?.seconds * 1000 || Date.now());
+                    const iconClass = a.type === 'alert' ? 'fa-bell' : a.type === 'maintenance' ? 'fa-wrench' : 'fa-info-circle';
+                    const audienceLabel = toAudienceLabel(a.audience);
+
+                return `
+                    <div class="announcement-card">
+                        <div class="announcement-header ${a.type}">
+                            <div class="announcement-icon ${a.type}">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div class="announcement-title">${a.title}</div>
+                        </div>
+                        <div class="announcement-body">
+                             <p class="announcement-message">${a.body}</p>
+                             <div class="announcement-meta">
+                                 <span><i class="fas fa-users"></i> ${audienceLabel}</span>
+                                 <span><i class="fas fa-clock"></i> ${formatTimestampManila(date, { hour: undefined, minute: undefined })}</span>
+                             </div>
+                         </div>
+                        <div class="announcement-actions">
+                            <button class="btn-action edit" onclick="editAnnouncement('${a.id}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-action archive" onclick="deleteAnnouncement('${a.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('createBtn').addEventListener('click', () => {
+                editingId = null;
+                document.getElementById('modalTitle').textContent = 'Create Announcement';
+                document.getElementById('announcementForm').reset();
+                document.getElementById('modal').classList.remove('hidden');
+            });
+
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+            const form = document.getElementById('announcementForm');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (isPosting) return;
+                isPosting = true;
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const cancelBtn = document.getElementById('cancelBtn');
+                const originalSubmit = submitBtn ? submitBtn.textContent : '';
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = editingId ? 'Saving...' : 'Posting...';
+                }
+                if (cancelBtn) cancelBtn.disabled = true;
+
+                const data = {
+                    type: document.getElementById('annType').value,
+                    title: document.getElementById('annTitle').value,
+                    body: document.getElementById('annMessage').value,
+                    audience: document.querySelector('input[name="audience"]:checked').value,
+                    isActive: true,
+                };
+
+                const validationError = firstValidationError([
+                    validateRequired(data.title, 'Title'),
+                    validateLength(data.title, { min: 3, max: 120, label: 'Title' }),
+                    validateRequired(data.body, 'Body'),
+                    validateLength(data.body, { min: 5, max: 1000, label: 'Body' }),
+                    validateEnum(data.type, ['general', 'maintenance', 'alert', 'update'], 'Announcement type'),
+                    validateEnum(data.audience, ['all', 'student', 'admin', 'super_admin', 'maintenance'], 'Audience'),
+                ]);
+
+                if (validationError) {
+                    showToast(validationError, { type: 'warning' });
+                    isPosting = false;
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalSubmit || 'Post Announcement';
+                    }
+                    if (cancelBtn) cancelBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    if (editingId) {
+                        await updateAnnouncement(editingId, data);
+                    } else {
+                        await createAnnouncement({ ...data, clientRequestId: generateRequestId() });
+                    }
+                    closeModal();
+                    await loadAnnouncements();
+                } catch (error) {
+                    logError('Error saving announcement:', error);
+                    handleRateLimitError(error);
+                    showToast('Could not save the announcement. Please try again.', { type: 'error' });
+                } finally {
+                    isPosting = false;
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalSubmit || 'Post Announcement';
+                    }
+                    if (cancelBtn) cancelBtn.disabled = false;
+                }
+            });
+
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = announcements.filter(a =>
+                    a.title.toLowerCase().includes(query) ||
+                    (a.body || '').toLowerCase().includes(query)
+                );
+                renderAnnouncements(filtered);
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        window.editAnnouncement = function (id) {
+            const ann = announcements.find(a => a.id === id);
+            if (!ann) return;
+
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Announcement';
+            document.getElementById('annType').value = ann.type;
+            document.getElementById('annTitle').value = ann.title;
+            document.getElementById('annMessage').value = ann.body;
+            const selectedRadio = document.querySelector(`input[name="audience"][value="${ann.audience}"]`) || document.querySelector('input[name="audience"][value="all"]');
+            if (selectedRadio) selectedRadio.checked = true;
+            document.getElementById('modal').classList.remove('hidden');
+        };
+
+        window.deleteAnnouncement = async function (id) {
+            if (!confirm('Delete this announcement?')) return;
+            try {
+                await deleteAnnouncementByAdmin(id);
+                await loadAnnouncements();
+            } catch (error) {
+                logError('Error archiving:', error);
+                handleRateLimitError(error);
+            }
+        };
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+

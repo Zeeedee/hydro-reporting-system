@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO - FAQ</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .loading-spinner-large {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            padding: 0 1.5rem 2rem;
+            font-size: 1.6rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 0.95rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+.main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 2.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+.search-box {
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 0.9rem 1.2rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s;
+        }
+
+        .faq-question:hover {
+            background: #f8fafc;
+        }
+
+        .faq-question i {
+            transition: transform 0.2s;
+            color: var(--gray);
+        }
+
+        .faq-item.open .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 500px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner-large"></div>
+    </div>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-droplet"></i>
+                HYDRO
+            </div>
+
+            <button type="button" class="submit-btn sidebar-submit-btn" data-open-submit-modal>
+                <i class="fa-solid fa-plus"></i>
+                Submit New Water Report
+            </button>
+
+                  <ul class="nav-list">
+        <li class="nav-item" data-nav-path="/index.html" onclick="location.href='index.html'"><i class="fa-solid fa-house"></i> Dashboard</li>
+        <li class="nav-item" data-nav-path="/MyRecords.html" onclick="location.href='MyRecords.html'"><i class="fa-solid fa-file-lines"></i> My Records</li>
+        <li class="nav-item" data-nav-path="/notifications.html" onclick="location.href='notifications.html'"><i class="fa-solid fa-bell"></i> Announcements</li>
+        <li class="nav-item" data-nav-path="/profile.html" onclick="location.href='profile.html'"><i class="fa-solid fa-user"></i> Profile</li>
+        <li class="nav-item" data-nav-path="/faq.html" onclick="location.href='faq.html'"><i class="fa-solid fa-circle-question"></i> FAQ</li>
+      </ul>
+
+        </aside>
+
+        <main class="main">
+
+            <header>
+                <h1>Frequently Asked Questions</h1>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">--</div>
+                    <div>
+                        <div><strong id="userName">Loading...</strong></div>
+                        <div class="role-label">Student</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn" title="Log out">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search FAQ...">
+            </div>
+
+            <div class="faq-list" id="faqList">
+                <!-- FAQ items will be rendered here -->
+            </div>
+
+        </main>
+    </div>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module" src="/js/student-init.js"></script>
+    <script type="module">
+        import { logOut, getStudentProfile } from './js/auth.js';
+        import { requireAuth } from './js/auth/auth-guard.js';
+        import { ROLES } from './js/config/app-constants.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { initHydroLightbox } from './js/ui/lightbox.js';
+        import { handleRateLimitError } from './js/shared/rate-limit-ui.js';
+        import { logError } from './js/shared/logger.js';
+
+        const functions = getFunctions(undefined, 'asia-southeast1');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const faqList = document.getElementById('faqList');
+        const searchInput = document.getElementById('searchInput');
+
+        // Default FAQ data (fallback if Firestore has no data)
+        const defaultFaqs = [
+            {
+                question: "How do I submit a water issue report?",
+                answer: "Click the 'Submit New Water Report' button in the sidebar, fill out the form with the building, location, issue type, and risk level, then click Submit. Your report will be reviewed by the maintenance team."
+            },
+            {
+                question: "What happens after I submit a report?",
+                answer: "Your report is sent to the maintenance team for review. You can track its status (Pending, In Progress, Resolved) from your Dashboard or My Records page. You'll see updates as the team works on resolving the issue."
+            },
+            {
+                question: "How long does it take for an issue to be resolved?",
+                answer: "Resolution times vary based on the severity and type of issue. Urgent issues (like contamination) are prioritized and typically addressed within 24 hours. Low-priority issues may take 3-5 business days."
+            },
+            {
+                question: "What should I mark as 'Urgent'?",
+                answer: "Mark an issue as Urgent if it poses immediate health or safety risks, such as: contaminated/brown water, complete water outage, major leaks causing flooding, or any situation requiring immediate attention."
+            },
+            {
+                question: "Can I edit or delete a submitted report?",
+                answer: "For data integrity, submitted reports cannot be edited or deleted. If you need to provide additional information, please submit a new report referencing the original issue."
+            },
+            {
+                question: "How do I change my password?",
+                answer: "Go to the Profile page from the sidebar, scroll to the 'Change Password' section, enter your current password and new password, then click 'Change Password'."
+            },
+            {
+                question: "Who can see my reports?",
+                answer: "Your reports are private and can only be viewed by you and the administrative/maintenance staff who handle them. Other students cannot see your reports."
+            },
+            {
+                question: "What buildings can I report issues for?",
+                answer: "You can report issues for any campus building listed in the system. Select the appropriate building when submitting your report."
+            },
+            {
+                question: "Is there a limit to how many reports I can submit?",
+                answer: "There is no limit to the number of reports you can submit. However, please avoid duplicate reports for the same issue. Check your existing reports first to see if the issue has already been reported."
+            },
+            {
+                question: "How do I contact support?",
+                answer: "For technical issues with the HYDRO system, please contact the IT helpdesk. For urgent water safety concerns outside of the reporting system, contact campus security directly."
+            }
+        ];
+
+        let faqs = [];
+
+        async function bootstrap() {
+            try {
+                const authState = await requireAuth({
+                    allowedRoles: [ROLES.STUDENT],
+                });
+                const user = authState.user;
+                await loadUserInfo(user);
+                initHydroLightbox();
+                await loadFaqs();
+                renderFaqs(faqs);
+            } catch (error) {
+                if (error?.message !== 'redirect') {
+                    logError('Initialization error:', error);
+                    faqs = defaultFaqs;
+                    renderFaqs(faqs);
+                }
+            }
+        }
+
+        bootstrap();
+
+        logoutBtn.addEventListener('click', () => {
+            logOut();
+        });
+
+        async function loadUserInfo(user) {
+            try {
+                const profile = await getStudentProfile();
+                const displayName = profile?.name || user.displayName || user.email?.split('@')[0] || 'Student';
+                const avatarUrl = profile?.avatarUrl || user.photoURL;
+
+                userName.textContent = displayName;
+
+                // Display photo if available, otherwise show initials
+                if (avatarUrl) {
+                    userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="profile-${user.uid}" onerror="this.parentElement.textContent='${getInitials(displayName)}'; this.remove();">`;
+                } else {
+                    userAvatar.textContent = getInitials(displayName);
+                }
+            } catch (error) {
+                logError('Error loading user info:', error);
+                userName.textContent = user.email?.split('@')[0] || 'Student';
+                userAvatar.textContent = 'U';
+            }
+        }
+
+        async function loadFaqs() {
+            try {
+                const getFaqs = httpsCallable(functions, 'getFaqs');
+                const result = await getFaqs();
+
+                if (result.data.success && result.data.faqs && result.data.faqs.length > 0) {
+                    faqs = result.data.faqs;
+                } else {
+                    // Use default FAQs if no data in Firestore
+                    faqs = defaultFaqs;
+                }
+            } catch (error) {
+                logError('Error loading FAQs from Firestore:', error);
+                handleRateLimitError(error);
+                // Fallback to default FAQs
+                faqs = defaultFaqs;
+            }
+        }
+
+        function renderFaqs(items) {
+            if (items.length === 0) {
+                faqList.innerHTML = '<div class="empty-state"><p>No matching FAQs found</p></div>';
+                return;
+            }
+
+            faqList.innerHTML = items.map((faq, index) => `
+        <div class="faq-item" data-index="${index}">
+          <div class="faq-question" onclick="toggleFaq(${index})">
+            ${escapeHtml(faq.question)}
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">${escapeHtml(faq.answer)}</div>
+        </div>
+      `).join('');
+        }
+
+        window.toggleFaq = function (index) {
+            const items = document.querySelectorAll('.faq-item');
+            items.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.toggle('open');
+                } else {
+                    item.classList.remove('open');
+                }
+            });
+        };
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                renderFaqs(faqs);
+                return;
+            }
+
+            const filtered = faqs.filter(faq =>
+                faq.question.toLowerCase().includes(query) ||
+                faq.answer.toLowerCase().includes(query)
+            );
+            renderFaqs(filtered);
+        });
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+    </script>
+
+</body>
+
+</html>
+ 
+
+
+
+

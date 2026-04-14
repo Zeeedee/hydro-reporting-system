@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Users</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .add-user-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-user-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        .inline-error {
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            min-height: 1rem;
+        }
+
+        .input-invalid {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.14) !important;
+        }
+
+        .filter-select {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            min-width: 120px;
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 200px;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .user-status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .user-status-badge.active {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .user-status-badge.inactive {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: block;
+            object-fit: cover;
+            background: var(--gray-light);
+        }
+
+        .user-avatar-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+            user-select: none;
+        }
+
+        .user-name {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-role.admin {
+            color: var(--primary);
+        }
+
+        .user-role.super_admin {
+            color: var(--red);
+        }
+
+        .user-role.maintenance {
+            color: var(--cyan);
+        }
+
+        .user-info {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-profile {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .btn-profile:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-remove {
+            padding: 0.5rem 1rem;
+            background: white;
+            color: var(--red);
+            border: 1px solid var(--red);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .btn-remove:hover {
+            background: #fee2e2;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 0 0 auto;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1 1 auto;
+        }
+
+        .profile-avatar {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: var(--gray-light);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar span {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        /* Profile photo enlarge uses shared lightbox module */
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .btn-cancel {
+            padding: 0.7rem 1.2rem;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            padding: 0.7rem 1.2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+            grid-column: 1/-1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .user-card.skeleton {
+            padding: 1.5rem;
+        }
+
+        .skeleton-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin: 8px auto;
+            width: 80%;
+        }
+
+        .skeleton-text.short {
+            width: 50%;
+        }
+
+        .skeleton-text.tiny {
+            width: 30%;
+            height: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .users-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+
+            .add-user-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 1s linear infinite;
+        }
+
+        @keyframes loadingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item active"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1 class="header-title">Users & Role Management</h1>
+                <p class="header-subtitle">Admin Management</p>
+            </div>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div class="add-user-panel">
+                <h3 style="margin-bottom:0.75rem; color:var(--primary);">Create User Account</h3>
+                <form id="addUserForm">
+                    <div class="add-user-grid">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-input" id="newUserName" placeholder="Full name" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="newUserEmail" placeholder="name@example.com" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" id="newUserRole" required>
+                                <option value="student">Student</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <button type="submit" class="btn-save" id="createUserBtn" style="width:100%;">Create User</button>
+                        </div>
+                    </div>
+                    <div class="inline-error" id="addUserError"></div>
+                </form>
+            </div>
+
+                    <div class="toolbar">
+                <select class="filter-select" id="roleFilter">
+                    <option value="">All Roles</option>
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                    <option value="super_admin">Super Admin</option>
+                    <option value="maintenance">Maintenance</option>
+                </select>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="invited">Invited</option>
+                    <option value="active">Active</option>
+                    <option value="disabled">Suspended</option>
+                </select>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search by name or email...">
+            </div>
+
+            <div class="inline-error" id="userActionMessage"></div>
+
+            <div class="users-grid" id="usersGrid">
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <p>Search for users by name or email</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Profile Modal -->
+    <div class="modal-overlay hidden" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">User Profile</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-avatar" id="profileAvatar" title="Click to enlarge">
+                    <span id="profileAvatarFallback">--</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="userName" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="userEmail" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-input" id="userPhone" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="userRole">
+                        <option value="student">Student</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="userStatus">
+                        <option value="invited">Invited</option>
+                        <option value="active">Active</option>
+                        <option value="disabled">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Activated</label>
+                    <input type="text" class="form-input" id="userActivated" readonly>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="cancelBtn">Cancel</button>
+                <button class="btn-save" id="saveBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initAdminAuthGuard, adminLogout, isSuperAdmin } from '../js/admin-auth.js';
+        import { searchUsers, getAllUsers, updateUserRole } from '../js/admin.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+        import { sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { auth, db } from '../js/firebase-config.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { COLLECTIONS } from '../js/config/app-constants.js';
+        import { buildActionCodeSettings } from '../js/auth/action-code-settings.js';
+        import { validateRequired, validateLength, validateEmail, validateEnum, firstValidationError } from '../js/validation/validation.js';
+        import { initHydroLightbox, openHydroLightbox } from '../js/ui/lightbox.js';
+        import { showToast } from '../js/ui/notice.js';
+        import { handleRateLimitError } from '../js/shared/rate-limit-ui.js';
+        import { logError, logWarn } from '../js/shared/logger.js';
+
+        const functions = getFunctions(undefined, 'asia-southeast1');
+
+        const ALLOWED_EMAIL_DOMAINS = new Set([
+            'phinmaed.com',
+            'gmail.com',
+            'yahoo.com',
+            'outlook.com',
+            'hotmail.com',
+        ]);
+
+        function getEmailDomain(email) {
+            const normalized = String(email || '').trim().toLowerCase();
+            const at = normalized.lastIndexOf('@');
+            if (at <= 0 || at === normalized.length - 1) return '';
+            return normalized.slice(at + 1);
+        }
+
+        let users = [];
+        let selectedUser = null;
+        let currentProfileAvatarUrl = '';
+        let profileOpenSeq = 0;
+        let lastDoc = null;
+        let hasMore = false;
+        let isSearchMode = false;
+        let canEditRoles = false;
+
+        async function init() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            try {
+                const user = await initAdminAuthGuard();
+
+                const roleSelect = document.getElementById('newUserRole');
+                canEditRoles = isSuperAdmin(user.role);
+                if (isSuperAdmin(user.role)) {
+                    roleSelect.innerHTML += '<option value="super_admin">Super Admin</option>';
+                }
+
+                // Show skeleton loaders while fetching
+                showSkeletons();
+
+                // Load users immediately
+                await loadAllUsers();
+
+                setupEventListeners();
+            } catch (error) {
+                logError('Init error:', error);
+            } finally {
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function showSkeletons() {
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = Array(8).fill().map(() => `
+                <div class="user-card skeleton">
+                    <div class="skeleton-avatar skeleton"></div>
+                    <div class="skeleton-text skeleton"></div>
+                    <div class="skeleton-text short skeleton"></div>
+                    <div class="skeleton-text tiny skeleton"></div>
+                </div>
+            `).join('');
+        }
+
+        async function loadAllUsers() {
+            const role = document.getElementById('roleFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            try {
+                const result = await getAllUsers({
+                    limit: 20,
+                    role: role || undefined,
+                    status: status || undefined
+                });
+                users = result.users;
+                lastDoc = result.lastDoc;
+                hasMore = result.hasMore;
+                isSearchMode = false;
+                renderUsers(users);
+            } catch (error) {
+                logError('Load users error:', error);
+                document.getElementById('usersGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load users. Please refresh.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function performSearch() {
+            const query = document.getElementById('searchBox').value.trim();
+            const role = document.getElementById('roleFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            // If search is cleared, load all users
+            if (query.length === 0) {
+                showSkeletons();
+                await loadAllUsers();
+                return;
+            }
+
+            if (query.length < 2) {
+                // Still show current users, just hint to type more
+                return;
+            }
+
+            showSkeletons();
+
+            try {
+                users = await searchUsers(query, role || null, status || null);
+                isSearchMode = true;
+                renderUsers(users);
+            } catch (error) {
+                logError('Search error:', error);
+            }
+        }
+
+        function renderUsers(userList) {
+            const grid = document.getElementById('usersGrid');
+
+            if (!userList.length) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No users found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = userList.map(u => {
+                const safeName = String(u.name || u.email || 'User');
+                const initials = getInitials(safeName);
+                const avatarUrl = String(u.avatarUrl || '').trim();
+                const statusRaw = String(u.status || 'active').trim();
+                const resendCount = Number(u.inviteResendCount || 0);
+                const statusLabel = statusRaw === 'invited'
+                    ? (resendCount > 0 ? `invited (resent ${resendCount})` : 'invited')
+                    : (statusRaw === 'disabled' ? 'suspended' : statusRaw);
+                const avatarHtml = avatarUrl
+                    ? `<img src="${avatarUrl}${avatarUrl.includes('?') ? '&' : '?'}v=${Date.now()}" class="user-avatar" alt="${escapeHtml(safeName)}" loading="lazy">`
+                    : `<div class="user-avatar user-avatar-fallback" aria-label="${escapeHtml(safeName)}">${escapeHtml(initials)}</div>`;
+
+                const showResend = statusRaw === 'invited' && u.activated === false && u.isArchived !== true;
+
+                return `
+                    <div class="user-card">
+                        <span class="user-status-badge ${u.isArchived ? 'inactive' : statusRaw}">${u.isArchived ? 'archived' : escapeHtml(statusLabel)}</span>
+                        ${avatarHtml}
+                        <div class="user-name">${u.name || 'Unknown'}</div>
+                        <div class="user-role ${u.role}">${(u.role || 'student').replace('_', ' ')}</div>
+                        <div class="user-info">
+                            ${u.email}<br>
+                            ${u.department ? 'Dept: ' + u.department : ''}
+                        </div>
+                        <div class="user-actions">
+                            ${canEditRoles ? `<button class="btn-profile" onclick="openProfile('${u.id}')">See Profile</button>` : ''}
+                            ${showResend ? `<button class="btn-profile" data-resend-id="${u.id}" onclick="resendInvite('${u.id}', this)">Resend Invite</button>` : ''}
+                            <button class="btn-remove" onclick="toggleArchive('${u.id}', ${u.isArchived === true ? 'false' : 'true'})">${u.isArchived === true ? 'Restore' : 'Archive'}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function validateFullName(value) {
+            const text = String(value || '').trim();
+            if (!text) return { ok: false, error: 'Name is required.' };
+            if (text.length < 2 || text.length > 120) {
+                return { ok: false, error: 'Name must be 2 to 120 characters.' };
+            }
+            try {
+                const pattern = new RegExp("^[\\p{L} '\\-]+$", 'u');
+                if (!pattern.test(text) || !new RegExp('\\p{L}', 'u').test(text)) {
+                    return { ok: false, error: 'Full name must contain letters and spaces only.' };
+                }
+            } catch (_) {
+                // Fallback for older regex engines.
+                if (!/^[A-Za-z '\-]+$/.test(text)) {
+                    return { ok: false, error: 'Full name must contain letters and spaces only.' };
+                }
+            }
+            return { ok: true, value: text };
+        }
+
+        function showUserActionMessage(text, type = 'error') {
+            const el = document.getElementById('userActionMessage');
+            if (!el) return;
+            el.style.color = type === 'ok' ? '#047857' : '#dc2626';
+            el.textContent = String(text || '').trim();
+        }
+
+        function clearUserActionMessage() {
+            const el = document.getElementById('userActionMessage');
+            if (!el) return;
+            el.textContent = '';
+        }
+
+        function setupEventListeners() {
+            let searchTimeout;
+            document.getElementById('searchBox').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 500);
+            });
+
+            document.getElementById('roleFilter').addEventListener('change', () => {
+                showSkeletons();
+                isSearchMode ? performSearch() : loadAllUsers();
+            });
+            document.getElementById('statusFilter').addEventListener('change', () => {
+                showSkeletons();
+                isSearchMode ? performSearch() : loadAllUsers();
+            });
+
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+            document.getElementById('saveBtn').addEventListener('click', async () => {
+                if (!selectedUser) return;
+
+                const role = document.getElementById('userRole').value;
+                const department = selectedUser?.department || '';
+                const status = document.getElementById('userStatus').value;
+
+                const validationError = firstValidationError([
+                    validateEnum(role, ['student', 'admin', 'super_admin', 'maintenance'], 'Role'),
+                    validateEnum(status, ['invited', 'active', 'disabled'], 'Status'),
+                ]);
+                if (validationError) {
+                    showToast(validationError, { type: 'warning' });
+                    return;
+                }
+
+                try {
+                    await updateUserRole(selectedUser.id, role, department, status);
+                    closeModal();
+                    performSearch();
+                } catch (error) {
+                    logError('Update error:', error);
+                    showToast('Could not save changes. Please try again.', { type: 'error' });
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', adminLogout);
+
+            const addUserForm = document.getElementById('addUserForm');
+            const addUserNameInput = document.getElementById('newUserName');
+            const addUserErrorEl = document.getElementById('addUserError');
+
+            if (addUserNameInput) {
+                addUserNameInput.addEventListener('input', () => {
+                    addUserNameInput.classList.remove('input-invalid');
+                    if (addUserErrorEl && addUserErrorEl.textContent === 'Full name must contain letters and spaces only.') {
+                        addUserErrorEl.textContent = '';
+                    }
+                });
+            }
+
+            addUserForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const errorEl = document.getElementById('addUserError');
+                const createBtn = document.getElementById('createUserBtn');
+                const nameInput = document.getElementById('newUserName');
+                if (nameInput) nameInput.classList.remove('input-invalid');
+                const payload = {
+                    name: document.getElementById('newUserName').value,
+                    email: document.getElementById('newUserEmail').value,
+                    role: document.getElementById('newUserRole').value,
+                };
+
+                const nameCheck = validateFullName(payload.name);
+                if (!nameCheck.ok) {
+                    errorEl.style.color = '#dc2626';
+                    errorEl.textContent = nameCheck.error;
+                    if (nameInput) {
+                        nameInput.classList.add('input-invalid');
+                        nameInput.focus();
+                    }
+                    return;
+                }
+                payload.name = nameCheck.value;
+
+                const emailCheck = validateEmail(payload.email);
+                const validationError = firstValidationError([
+                    emailCheck,
+                    validateEnum(payload.role, ['student', 'maintenance', 'admin', 'super_admin'], 'Role'),
+                ]);
+
+                if (validationError) {
+                    errorEl.style.color = '#dc2626';
+                    errorEl.textContent = validationError;
+                    return;
+                }
+
+                payload.email = emailCheck.value;
+                const domain = getEmailDomain(payload.email);
+                if (!ALLOWED_EMAIL_DOMAINS.has(domain)) {
+                    errorEl.style.color = '#dc2626';
+                    errorEl.textContent = 'Email domain not allowed. Use @phinmaed.com, @gmail.com, @yahoo.com, @outlook.com, or @hotmail.com.';
+                    return;
+                }
+
+                errorEl.textContent = '';
+                createBtn.disabled = true;
+                createBtn.textContent = 'Creating...';
+
+                try {
+                    const createUserByAdmin = httpsCallable(functions, 'createUserByAdmin');
+                    await createUserByAdmin(payload);
+                    await sendPasswordResetEmail(auth, payload.email, buildActionCodeSettings({ flow: 'setup' }));
+                    addUserForm.reset();
+                    errorEl.style.color = '#047857';
+                    errorEl.textContent = 'User created. Password setup email sent.';
+                    await loadAllUsers();
+                } catch (error) {
+                    logError('Create user error:', error);
+                    if (handleRateLimitError(error)) {
+                        errorEl.style.color = '#dc2626';
+                        errorEl.textContent = 'Too many actions. Please wait a bit and try again.';
+                        return;
+                    }
+                    errorEl.style.color = '#dc2626';
+                    errorEl.textContent = error?.message || 'Failed to create user.';
+                } finally {
+                    createBtn.disabled = false;
+                    createBtn.textContent = 'Create User';
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            selectedUser = null;
+            currentProfileAvatarUrl = '';
+            profileOpenSeq += 1;
+
+            document.body.style.overflow = '';
+
+            const avatar = document.getElementById('profileAvatar');
+            if (avatar) {
+                avatar.innerHTML = '<span>--</span>';
+            }
+        }
+
+        function getInitials(name) {
+            const parts = String(name || '').trim().split(' ').filter(Boolean);
+            if (!parts.length) return 'U';
+            if (parts.length === 1) return parts[0][0].toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function setAvatarPreview(url, name) {
+            const avatar = document.getElementById('profileAvatar');
+            if (!avatar) return;
+
+            const rawUrl = String(url || '').trim();
+            const displayUrl = rawUrl
+                ? `${rawUrl}${rawUrl.includes('?') ? '&' : '?'}v=${Date.now()}`
+                : '';
+            currentProfileAvatarUrl = displayUrl;
+
+            avatar.innerHTML = '';
+            if (currentProfileAvatarUrl) {
+                const img = document.createElement('img');
+                img.src = currentProfileAvatarUrl;
+                img.alt = 'Profile photo';
+                img.setAttribute('data-hydro-lightbox', '');
+                img.setAttribute('data-lightbox-src', currentProfileAvatarUrl);
+                if (selectedUser?.id) {
+                    img.setAttribute('data-lightbox-group', `profile-${selectedUser.id}`);
+                }
+                img.onerror = () => {
+                    avatar.innerHTML = '';
+                    const span = document.createElement('span');
+                    span.textContent = getInitials(name);
+                    avatar.appendChild(span);
+                };
+                avatar.appendChild(img);
+                initHydroLightbox();
+            } else {
+                const span = document.createElement('span');
+                span.textContent = getInitials(name);
+                avatar.appendChild(span);
+            }
+        }
+
+        function bindProfileAvatarEnlarge() {
+            const avatar = document.getElementById('profileAvatar');
+            if (!avatar) return;
+            if (avatar.dataset.lbBound === '1') return;
+            avatar.dataset.lbBound = '1';
+
+            avatar.addEventListener('click', (event) => {
+                const src = String(currentProfileAvatarUrl || '').trim();
+                if (!src) return;
+                event.preventDefault();
+                event.stopPropagation();
+                openHydroLightbox([src], 0);
+            });
+        }
+
+        function toDate(value) {
+            if (!value) return null;
+            if (typeof value.toDate === 'function') return value.toDate();
+            if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+            if (typeof value._seconds === 'number') return new Date(value._seconds * 1000);
+            const parsed = new Date(value);
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function formatManilaDateTime(value) {
+            const d = toDate(value);
+            if (!d) return '';
+            return new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Manila',
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(d);
+        }
+
+        window.openProfile = function (userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            profileOpenSeq += 1;
+            const seq = profileOpenSeq;
+
+            selectedUser = user;
+
+            // Always clear the avatar first to prevent stale images
+            // even if anything below fails.
+            currentProfileAvatarUrl = '';
+            const avatarBox = document.getElementById('profileAvatar');
+            if (avatarBox) {
+                avatarBox.innerHTML = '';
+                const span = document.createElement('span');
+                span.textContent = getInitials(user.name || user.email);
+                avatarBox.appendChild(span);
+            }
+
+            document.getElementById('userName').value = user.name || '';
+            document.getElementById('userEmail').value = user.email || '';
+            document.getElementById('userPhone').value = user.phone || '';
+            document.getElementById('userRole').value = user.role || 'student';
+            document.getElementById('userStatus').value = user.status || 'active';
+
+            const activatedInput = document.getElementById('userActivated');
+            if (activatedInput) {
+                const status = String(user.status || 'active').trim();
+                const activated = user.activated !== false && status !== 'invited' && status !== 'disabled';
+                const when = formatManilaDateTime(user.activatedAt);
+                const reason = !activated && status !== 'active' ? ` (${status})` : '';
+                activatedInput.value = activated ? (when ? `Yes (${when})` : 'Yes') : (when ? `No${reason} (${when})` : `No${reason}`);
+            }
+
+            try {
+                setAvatarPreview(user.avatarUrl || '', user.name || user.email);
+            } catch (error) {
+                logWarn('setAvatarPreview failed (list):', error);
+            }
+            bindProfileAvatarEnlarge();
+
+            // Always hydrate from users/{uid} to avoid stale list data.
+            getDoc(doc(db, COLLECTIONS.USERS, user.id))
+                .then((snap) => {
+                    if (seq !== profileOpenSeq) return;
+                    if (!selectedUser || selectedUser.id !== user.id) return;
+                    if (!snap.exists()) return;
+                    const data = snap.data() || {};
+                    const name = String(data.name || user.name || '').trim();
+                    const email = String(data.email || user.email || '').trim();
+                    const phone = String(data.phone || user.phone || '').trim();
+                    const avatar = String(data.avatarUrl || user.avatarUrl || '').trim();
+
+                    if (name) document.getElementById('userName').value = name;
+                    if (email) document.getElementById('userEmail').value = email;
+                    document.getElementById('userPhone').value = phone;
+
+                    const role = String(data.role || user.role || 'student').trim();
+                    const status = String(data.status || user.status || 'active').trim();
+                    document.getElementById('userRole').value = role || 'student';
+                    document.getElementById('userStatus').value = status || 'active';
+
+                    try {
+                        setAvatarPreview(avatar, name || email);
+                    } catch (error) {
+                        logWarn('setAvatarPreview failed (hydrate):', error);
+                    }
+                    bindProfileAvatarEnlarge();
+                })
+                .catch(() => {});
+            document.getElementById('modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.toggleArchive = async function (userId, shouldArchive) {
+            const actionLabel = shouldArchive ? 'archive' : 'restore';
+            if (!confirm(`Are you sure you want to ${actionLabel} this user?`)) return;
+            try {
+                const callable = httpsCallable(functions, 'setUserArchiveStatus');
+                await callable({ userId, isArchived: shouldArchive });
+                await loadAllUsers();
+            } catch (error) {
+                logError('Archive update failed:', error);
+                if (handleRateLimitError(error)) {
+                    return;
+                }
+                showUserActionMessage('Could not update the user status. Please try again.');
+            }
+        };
+
+        window.resendInvite = async function (userId, buttonEl) {
+            clearUserActionMessage();
+
+            const normalizedId = String(userId || '').trim();
+            if (!normalizedId) {
+                showUserActionMessage('Missing user id.');
+                return;
+            }
+
+            const btn = buttonEl && typeof buttonEl === 'object' ? buttonEl : null;
+            const originalText = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+            }
+
+            try {
+                const resendInviteByAdmin = httpsCallable(functions, 'resendInviteByAdmin');
+                const result = await resendInviteByAdmin({ userId: normalizedId });
+                const email = String(result?.data?.email || '').trim();
+                if (!email) {
+                    throw new Error('Invite email is missing.');
+                }
+
+                await sendPasswordResetEmail(auth, email, buildActionCodeSettings({ flow: 'setup' }));
+                showUserActionMessage(`Invite sent to ${email}.`, 'ok');
+                await loadAllUsers();
+            } catch (error) {
+                logError('Resend invite failed:', error);
+                if (handleRateLimitError(error)) {
+                    showUserActionMessage('Too many actions. Please wait a bit and try again.');
+                    return;
+                }
+
+                const code = String(error?.code || '');
+                if (code === 'functions/failed-precondition' || code.endsWith('/failed-precondition')) {
+                    showUserActionMessage('User is not in invited state.');
+                    return;
+                }
+                if (code === 'auth/too-many-requests') {
+                    showUserActionMessage('Too many requests. Please wait and try again later.');
+                    return;
+                }
+
+                const msg = String(error?.message || '').trim();
+                showUserActionMessage(msg && msg.length <= 180 ? msg : 'Failed to resend invite.');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText || 'Resend Invite';
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+
+</html>
+
+
+
+

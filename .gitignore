@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+scripts/node_modules/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+storage-debug.log
+pubsub-debug.log
+database-debug.log
+
+# Firebase emulator data
+*-emulator-export/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Local notes and one-off reports
+WORKLOG.md
+/PHASE_*_SCAN_REPORT.*
+/*_SCAN_REPORT.*
+/*_REPORT.*

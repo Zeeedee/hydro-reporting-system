@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Maintenance - Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .notify-btn {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid var(--gray-light);
+            background: white;
+            color: var(--primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notify-btn:hover {
+            background: var(--light);
+        }
+
+        .notify-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 999px;
+            background: var(--red);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            line-height: 1;
+        }
+
+        .notify-badge.show {
+            display: inline-flex;
+        }
+
+        .notify-badge.error {
+            background: #0f172a;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+.dashboard-content {
+            padding: 2rem;
+        }
+
+        /* Stats Grid - 4 cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .stat-card.yellow {
+            background: linear-gradient(135deg, var(--yellow) 0%, #d97706 100%);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+        }
+
+        .stat-card.cyan {
+            background: linear-gradient(135deg, var(--cyan) 0%, #0891b2 100%);
+        }
+
+        .stat-card.red {
+            background: linear-gradient(135deg, var(--red) 0%, #dc2626 100%);
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* Daily Reports Table */
+        .table-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .task-notice {
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            background: #fff7ed;
+            color: #9a3412;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .task-notice.hidden {
+            display: none;
+        }
+
+        .task-notice a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .task-notice a:hover {
+            text-decoration: underline;
+        }
+
+        .announcements-preview {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            background: #f8fafc;
+        }
+
+        .announcements-preview.hidden {
+            display: none;
+        }
+
+        .announcements-preview-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .announcements-preview-title {
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .announcements-preview a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .announcements-preview a:hover {
+            text-decoration: underline;
+        }
+
+        .announcements-preview-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .announcement-item {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .announcement-item-title {
+            font-weight: 700;
+            color: #0f172a;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .announcement-item-date {
+            font-size: 0.85rem;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .priority-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            border: 1px solid var(--gray-light);
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .priority-pill.urgent {
+            background: rgba(249, 115, 22, 0.12);
+            border-color: rgba(249, 115, 22, 0.28);
+            color: #c2410c;
+        }
+
+        .priority-pill.high {
+            background: rgba(220, 38, 38, 0.10);
+            border-color: rgba(220, 38, 38, 0.22);
+            color: #b91c1c;
+        }
+
+        .priority-pill.medium {
+            background: rgba(29, 78, 216, 0.10);
+            border-color: rgba(29, 78, 216, 0.22);
+            color: #1d4ed8;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-title i {
+            color: var(--cyan);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reports-table th,
+        .reports-table td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+        }
+
+        .reports-table th {
+            background: var(--light);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reports-table tr {
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .reports-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .reports-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.pending,
+        .status-badge.assigned {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-badge.accepted {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-badge.in_progress {
+            background: #cffafe;
+            color: #0e7490;
+        }
+
+        .status-badge.done,
+        .status-badge.completed {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .status-badge.expired {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-accept {
+            background: var(--green);
+            color: white;
+        }
+
+        .btn-accept:hover {
+            background: #059669;
+        }
+
+        .btn-done {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .btn-done:hover {
+            background: #0891b2;
+        }
+
+        .btn-view {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--gray-light);
+        }
+
+        .btn-view:hover {
+            background: var(--light);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-content {
+                padding: 1rem;
+            }
+
+            .reports-table th,
+            .reports-table td {
+                padding: 0.7rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Maintenance Team</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i> Tasks</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-user-cog"></i> Profile Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1 class="header-title">Dashboard</h1>
+            <div class="header-actions">
+                <button class="notify-btn" id="notifyBtn" type="button" title="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notify-badge" id="notifyBadge">0</span>
+                </button>
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">--</div>
+                    <div class="user-meta">
+                        <div class="user-name" id="userName">Maintenance</div>
+                        <div class="role-label">Maintenance</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card yellow">
+                    <div class="stat-title">Total Issues Resolved</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-title">Pending Tasks</div>
+                    <div class="stat-value" id="statPending">0</div>
+                </div>
+                <div class="stat-card cyan">
+                    <div class="stat-title">In Progress</div>
+                    <div class="stat-value" id="statInProgress">0</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-title">Resolved This Week</div>
+                    <div class="stat-value" id="statWeek">0</div>
+                </div>
+            </div>
+
+            <!-- Daily Reports Table -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="table-title"><i class="fas fa-clipboard-list"></i> Daily Report</h3>
+                    <select class="filter-select" id="dateFilter">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+
+                <div class="task-notice hidden" id="taskNotice">
+                    <div><i class="fa-solid fa-circle-exclamation" style="margin-right:0.5rem;"></i><span id="taskNoticeText">You have tasks awaiting acceptance.</span></div>
+                    <a href="tasks.html">View</a>
+                </div>
+
+                <div class="announcements-preview" id="announcementsPreview">
+                    <div class="announcements-preview-head">
+                        <div class="announcements-preview-title"><i class="fa-solid fa-bullhorn"></i> Latest Announcements</div>
+                        <a href="announcements.html">Open</a>
+                    </div>
+                    <div class="announcements-preview-list" id="announcementsPreviewList"></div>
+                </div>
+
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Issue Type</th>
+                            <th>Building</th>
+                            <th>Area</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasksTableBody">
+                        <!-- Tasks will be loaded here -->
+                    </tbody>
+                </table>
+
+                <div class="empty-state hidden" id="emptyState">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No tasks assigned for today</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+  
+<script type="module">
+        import { initMaintenanceAuthGuard, maintenanceLogout } from '../js/maintenance-auth.js';
+        import { getMyStats, getMyTasks, getMyTaskBadgeCounts, acceptTask, startTask, markTaskDone } from '../js/maintenance.js';
+        import { validateRequired } from '../js/validation/validation.js';
+        import { getUnreadAnnouncementsCount, getAnnouncementsList } from '../js/notifications.js';
+        import { ROLES } from '../js/config/app-constants.js';
+        import { formatTimestampManila } from '../js/timezone.js';
+        import { initHydroLightbox } from '../js/ui/lightbox.js';
+        import { showToast } from '../js/ui/notice.js';
+        import { requestWorkReport } from '../js/ui/work-report-modal.js';
+        import { logError } from '../js/shared/logger.js';
+
+        let tasks = [];
+
+        // Helper function to get initials from name
+        function getInitials(name) {
+            if (!name) return 'M';
+            const parts = name.trim().split(' ').filter(p => p.length > 0);
+            if (parts.length === 0) return 'M';
+            if (parts.length === 1) return parts[0][0].toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        async function init() {
+            let shouldHideLoadingOverlay = true;
+            try {
+                const user = await initMaintenanceAuthGuard();
+
+                const displayName = user.name || user.email;
+                const avatarUrl = user.avatarUrl;
+
+                document.getElementById('userName').textContent = displayName;
+
+                // Display photo if available, otherwise show initials
+                const userAvatar = document.getElementById('userAvatar');
+                if (avatarUrl) {
+                    const group = `profile-${user.uid || ''}`;
+                    userAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" data-hydro-lightbox data-lightbox-src="${avatarUrl}" data-lightbox-group="${group}" onerror="this.parentElement.textContent='${getInitials(displayName)}'; this.remove();">`;
+                    initHydroLightbox();
+                } else {
+                    userAvatar.textContent = getInitials(displayName);
+                }
+
+                await loadDashboardData();
+            } catch (error) {
+                logError('Init error:', error);
+                if (error.message === 'redirect') {
+                    shouldHideLoadingOverlay = false;
+                }
+
+                // Only show error UI if not a redirect (redirect errors are expected)
+                if (error.message !== 'redirect') {
+                    showErrorState(error.message || 'Failed to load dashboard. Please try again.');
+                }
+            } finally {
+                if (shouldHideLoadingOverlay) {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                }
+            }
+        }
+
+        // Show error state in the dashboard content area
+        function showErrorState(message) {
+            const content = document.querySelector('.dashboard-content');
+            if (content) {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h2 style="color: #1e293b; margin-bottom: 0.5rem;">Unable to Load Dashboard</h2>
+                        <p style="color: #64748b; margin-bottom: 1.5rem;">${message}</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center;">
+                            <button onclick="location.reload()" style="padding: 0.75rem 1.5rem; background: #1a5f7a; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                                <i class="fas fa-refresh" style="margin-right: 0.5rem;"></i>Refresh Page
+                            </button>
+                            <a href="/login.html" style="padding: 0.75rem 1.5rem; background: #e2e8f0; color: #1e293b; text-decoration: none; border-radius: 8px; font-weight: 500;">
+                                Return to Sign In
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const stats = await getMyStats();
+                document.getElementById('statTotal').textContent = stats.totalResolved || 0;
+                document.getElementById('statPending').textContent = stats.pendingTasks || 0;
+                document.getElementById('statInProgress').textContent = stats.inProgressTasks || 0;
+                document.getElementById('statWeek').textContent = stats.resolvedThisWeek || 0;
+
+                await refreshNotificationBadge();
+
+                await loadAnnouncementsPreview();
+
+                // Load tasks
+                tasks = await getMyTasks();
+                renderTasks(filterTasks());
+            } catch (error) {
+                logError('Error loading data:', error);
+            }
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        async function refreshNotificationBadge() {
+            const badge = document.getElementById('notifyBadge');
+            const notice = document.getElementById('taskNotice');
+            const noticeText = document.getElementById('taskNoticeText');
+            if (!badge) return;
+
+            badge.classList.remove('show', 'error');
+            try {
+                const [taskCounts, unread] = await Promise.all([
+                    getMyTaskBadgeCounts(),
+                    getUnreadAnnouncementsCount(),
+                ]);
+
+                const awaiting = Number(taskCounts?.awaitingAcceptance || 0);
+                const urgentOpen = Number(taskCounts?.urgentOpen || 0);
+                const unreadCount = Number(unread?.unreadCount || 0);
+                const total = awaiting + urgentOpen + unreadCount;
+
+                if (total > 0) {
+                    badge.textContent = total > 99 ? '99+' : String(total);
+                    badge.classList.add('show');
+                }
+
+                if (notice && noticeText) {
+                    if (awaiting > 0) {
+                        noticeText.textContent = `You have ${awaiting} task${awaiting === 1 ? '' : 's'} awaiting acceptance.`;
+                        notice.classList.remove('hidden');
+                    } else {
+                        notice.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                logError('[maintenance] badge refresh failed', error);
+                badge.textContent = '!';
+                badge.classList.add('show', 'error');
+            }
+        }
+
+        async function loadAnnouncementsPreview() {
+            const container = document.getElementById('announcementsPreviewList');
+            const preview = document.getElementById('announcementsPreview');
+            if (!container || !preview) return;
+
+            try {
+                const result = await getAnnouncementsList({ limit: 5, role: ROLES.MAINTENANCE });
+                if (!result.success) {
+                    preview.classList.add('hidden');
+                    return;
+                }
+
+                const items = Array.isArray(result.announcements) ? result.announcements.slice(0, 3) : [];
+                if (!items.length) {
+                    preview.classList.add('hidden');
+                    return;
+                }
+
+                preview.classList.remove('hidden');
+                container.innerHTML = items.map((a) => {
+                    const date = a.createdAt instanceof Date ? a.createdAt : new Date();
+                    return `
+                        <div class="announcement-item">
+                            <div class="announcement-item-title" title="${escapeHtml(a.title || '')}">${escapeHtml(a.title || 'Announcement')}</div>
+                            <div class="announcement-item-date">${formatTimestampManila(date, { hour: undefined, minute: undefined })}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                logError('[maintenance] announcements preview failed', error);
+                preview.classList.add('hidden');
+            }
+        }
+
+        function filterTasks() {
+            const filter = document.getElementById('dateFilter').value;
+            const now = new Date();
+
+            return tasks.filter(task => {
+                const taskDate = task.assignedAt?.toDate?.() ||
+                    new Date(task.assignedAt?.seconds * 1000 || Date.now());
+
+                if (filter === 'today') {
+                    return taskDate.toDateString() === now.toDateString();
+                } else if (filter === 'week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    return taskDate >= weekAgo;
+                }
+                return true;
+            });
+        }
+
+        function renderTasks(taskList) {
+            const tbody = document.getElementById('tasksTableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (!taskList.length) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            tbody.innerHTML = taskList.map(task => {
+                const report = task.report || {};
+                let actions = '';
+
+                if (task.status === 'assigned' || task.status === 'pending') {
+                    actions = `
+                        <button class="btn-action btn-accept" onclick="handleAccept('${task.id}')">Accept</button>
+                        <button class="btn-action btn-view" onclick="viewDetails('${task.id}')">Details</button>
+                    `;
+                } else if (task.status === 'accepted') {
+                    actions = `
+                        <button class="btn-action btn-accept" onclick="handleStart('${task.id}')">Start</button>
+                        <button class="btn-action btn-view" onclick="viewDetails('${task.id}')">Details</button>
+                    `;
+                } else if (task.status === 'in_progress') {
+                    actions = `
+                        <button class="btn-action btn-done" onclick="handleDone('${task.id}')">Done</button>
+                        <button class="btn-action btn-view" onclick="viewDetails('${task.id}')">Details</button>
+                    `;
+                } else {
+                    actions = `<button class="btn-action btn-view" onclick="viewDetails('${task.id}')">Details</button>`;
+                }
+
+                const priority = String(task.priority || report.riskLevel || 'low');
+
+                return `
+                    <tr>
+                        <td>#${task.id.substring(0, 6).toUpperCase()}</td>
+                        <td>${report.issueType || 'N/A'}</td>
+                        <td>${report.building ? `${report.building}${report.floor ? `, ${report.floor}` : ''}` : 'N/A'}</td>
+                        <td>${report.area || report.location || 'N/A'}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                                <span class="priority-pill ${priority}"><i class="fas fa-flag"></i>${priority.toUpperCase()}</span>
+                                <span class="status-badge ${task.status}">${String(task.status || '').replace('_', ' ')}</span>
+                            </div>
+                        </td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.handleAccept = async function (taskId) {
+            const taskCheck = validateRequired(taskId, 'Task ID');
+            if (!taskCheck.valid) {
+                showToast(taskCheck.error, { type: 'warning' });
+                return;
+            }
+            try {
+                await acceptTask(taskId);
+                await loadDashboardData();
+            } catch (error) {
+                logError('Accept error:', error);
+                showToast('Could not accept this task. Please try again.', { type: 'error' });
+            }
+        };
+
+        window.handleDone = async function (taskId) {
+            const taskCheck = validateRequired(taskId, 'Task ID');
+            if (!taskCheck.valid) {
+                showToast(taskCheck.error, { type: 'warning' });
+                return;
+            }
+            try {
+                const notes = await requestWorkReport({
+                    title: 'Work Report',
+                    help: 'Required to complete this job. Include what was done and any follow-ups.',
+                    maxLength: 800,
+                });
+                if (!notes) return;
+                await markTaskDone(taskId, notes);
+                await loadDashboardData();
+            } catch (error) {
+                logError('Done error:', error);
+                showToast('Could not mark this task as done. Please try again.', { type: 'error' });
+            }
+        };
+
+        window.handleStart = async function (taskId) {
+            const taskCheck = validateRequired(taskId, 'Task ID');
+            if (!taskCheck.valid) {
+                showToast(taskCheck.error, { type: 'warning' });
+                return;
+            }
+            try {
+                await startTask(taskId);
+                await loadDashboardData();
+            } catch (error) {
+                logError('Start error:', error);
+                showToast('Could not start this task. Please try again.', { type: 'error' });
+            }
+        };
+
+        window.viewDetails = function (taskId) {
+            const safeId = String(taskId || '').trim();
+            if (!safeId) {
+                showToast('This task link is missing an ID. Please refresh and try again.', { type: 'warning' });
+                return;
+            }
+            window.location.href = `task-details.html?id=${encodeURIComponent(safeId)}`;
+        };
+
+        document.getElementById('notifyBtn')?.addEventListener('click', () => {
+            window.location.href = 'announcements.html';
+        });
+
+        document.getElementById('dateFilter').addEventListener('change', () => {
+            renderTasks(filterTasks());
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', maintenanceLogout);
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+
+

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Admin - Audit Logs</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .btn-logout {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--light);
+            color: var(--danger);
+        }
+
+        .page-content {
+            padding: 2rem;
+        }
+
+        .error-banner {
+            display: none;
+            margin: 0 0 1rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .error-banner.is-visible {
+            display: block;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 2fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 0.35rem;
+        }
+
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            padding: 0.75rem 0.85rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+        }
+
+        .table-wrap {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.85rem 0.9rem;
+            border-bottom: 1px solid var(--gray-light);
+            text-align: left;
+            font-size: 0.9rem;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .meta-cell {
+            color: var(--gray);
+            font-size: 0.85rem;
+            max-width: 420px;
+        }
+
+        .btn-view {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 0.55rem 0.85rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-dark);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.9rem;
+        }
+
+        .pager {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-page {
+            border: 1px solid var(--gray-light);
+            background: white;
+            border-radius: 10px;
+            padding: 0.6rem 0.85rem;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn-page:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .page-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .loading-row {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        .inline-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: auditSpin 0.8s linear infinite;
+            vertical-align: -2px;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes auditSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            z-index: 2500;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 720px;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            border: none;
+            background: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+        }
+
+        pre {
+            margin: 0;
+            padding: 1rem 1.25rem;
+            max-height: 70vh;
+            overflow: auto;
+            background: #0b1220;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1024px) {
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Digital Water Safety</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="reports.html" class="nav-item"><i class="fas fa-file-alt"></i> Report Management</a>
+            <a href="announcements.html" class="nav-item"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="users.html" class="nav-item"><i class="fas fa-users"></i> Users</a>
+            <a href="locations.html" class="nav-item"><i class="fas fa-map-marker-alt"></i> Locations</a>
+            <a href="analytics.html" class="nav-item"><i class="fas fa-chart-line"></i> Report & Analytics</a>
+            <a href="audit-logs.html" class="nav-item"><i class="fas fa-clipboard-list"></i> Audit Logs</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1 class="header-title">Audit Logs</h1>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div id="auditError" class="error-banner"></div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterFrom">From</label>
+                    <input id="filterFrom" type="date" class="filter-input" />
+                </div>
+                <div class="filter-group">
+                    <label for="filterTo">To</label>
+                    <input id="filterTo" type="date" class="filter-input" />
+                </div>
+                <div class="filter-group">
+                    <label for="filterRole">Actor Role</label>
+                    <select id="filterRole" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterAction">Action Type</label>
+                    <select id="filterAction" class="filter-select"></select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterSearch">Search</label>
+                    <input id="filterSearch" type="text" class="filter-input" placeholder="actorUid / targetId / metadata" autocomplete="off" />
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Actor Name</th>
+                            <th>Actor UID</th>
+                            <th>Actor Role</th>
+                            <th>Action Type</th>
+                            <th>Target Type</th>
+                            <th>Target ID</th>
+                            <th>Metadata</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditLogsTbody">
+                        <tr>
+                            <td class="loading-row" colspan="8">Loading audit logs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="toolbar">
+                <div class="page-label" id="pageLabel">Page 1</div>
+                <div class="pager">
+                    <button type="button" class="btn-page" id="prevBtn" disabled>Prev</button>
+                    <button type="button" class="btn-page" id="nextBtn" disabled>Next</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay hidden" id="metadataModal" role="dialog" aria-modal="true" aria-labelledby="metadataTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="metadataTitle">Metadata</div>
+                <button type="button" class="modal-close" id="closeMetadataModal" aria-label="Close">&times;</button>
+            </div>
+            <pre id="metadataPre">{}</pre>
+        </div>
+    </div>
+
+    <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+    <script type="module" src="/js/ui/activeNav.js"></script>
+    <script type="module" src="/js/admin/audit-logs.js"></script>
+</body>
+
+</html>

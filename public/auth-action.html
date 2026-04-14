@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HYDRO - Account Action</title>
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #3b82f6;
+      --surface: #ffffff;
+      --bg: #f3f6fb;
+      --text: #1e293b;
+      --muted: #64748b;
+      --error: #dc2626;
+      --ok: #047857;
+      --border: #dbe2ee;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      padding: 1.5rem;
+    }
+
+    .brand { text-align: center; margin-bottom: 1rem; }
+    .brand i { color: var(--primary-light); font-size: 2rem; }
+    h1 { margin: 0.35rem 0; text-align: center; font-size: 1.5rem; color: var(--primary); }
+    p.subtitle { margin: 0 0 1rem; text-align: center; color: var(--muted); }
+
+    .message {
+      display: none;
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.92rem;
+    }
+
+    .message.show { display: block; }
+    .message.error { background: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
+    .message.success { background: #d1fae5; color: var(--ok); border: 1px solid #a7f3d0; }
+    .message.info { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    .field { margin-bottom: 0.85rem; }
+    .field label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.92rem; }
+
+    .input-wrap { position: relative; }
+    .input-wrap input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 2.5rem 0.75rem 0.8rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-wrap input:focus { border-color: var(--primary-light); }
+
+    .input-wrap.no-toggle input {
+      padding-right: 0.8rem;
+    }
+
+    .toggle {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .password-rules {
+      margin: 0.25rem 0 0.75rem;
+      padding-left: 1rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .password-rules li.valid { color: var(--ok); }
+    .password-rules li.invalid { color: var(--error); }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .hidden { display: none; }
+    .actions { margin-top: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <i class="fa-solid fa-droplet"></i>
+      <h1 id="title">Account Action</h1>
+      <p class="subtitle" id="subtitle">Please wait...</p>
+    </div>
+
+    <div class="message" id="messageBox"></div>
+
+    <section id="loadingState">
+      <div class="message show info">Processing your request...</div>
+    </section>
+
+    <section id="resetState" class="hidden">
+      <form id="resetForm" novalidate>
+        <div class="field">
+          <label for="newPassword">New Password</label>
+          <div class="input-wrap">
+            <input id="newPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="16" />
+            <button type="button" class="toggle" data-toggle="newPassword" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-wrap">
+            <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="8" maxlength="16" />
+            <button type="button" class="toggle" data-toggle="confirmPassword" aria-label="Toggle password visibility">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="password-rules" id="passwordRules">
+          <li data-rule="length">Password must be 8-16 characters</li>
+          <li data-rule="mix">Must include uppercase, lowercase, number, and special character</li>
+          <li data-rule="match">Passwords must match</li>
+        </ul>
+
+        <div id="setupFields" class="hidden">
+          <div class="field">
+            <label for="setupPhone">Phone Number</label>
+            <div class="input-wrap no-toggle">
+              <input id="setupPhone" type="tel" autocomplete="tel" required maxlength="20" placeholder="e.g. +639171234567" />
+            </div>
+          </div>
+        </div>
+
+        <button class="btn" id="resetSubmitBtn" type="submit" disabled>Update Password</button>
+      </form>
+    </section>
+
+    <section id="resultState" class="hidden">
+      <div class="actions">
+        <button class="btn" id="goToSignInBtn" type="button">Go to Sign In</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/auth/auth-action-handler.js"></script>
+</body>
+</html>

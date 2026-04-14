@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>HYDRO Admin - Security Setup</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(26, 95, 122, 0.12), transparent 50%),
+        radial-gradient(900px 600px at 85% 25%, rgba(49, 200, 168, 0.14), transparent 55%),
+        var(--light);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 22px 24px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .card-header .brand h1 {
+      color: #ffffff;
+    }
+
+    .card-header .brand i {
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand i {
+      font-size: 1.4rem;
+      color: var(--cyan);
+    }
+
+    .brand h1 {
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .card-body {
+      padding: 22px 24px 26px;
+    }
+
+    .lead {
+      margin: 0 0 14px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 700;
+      font-size: 0.9rem;
+      max-width: min(520px, 90vw);
+    }
+
+    .pill i {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .pill span {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .enroll-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 14px;
+      align-items: start;
+    }
+
+    .enroll-layout > * {
+      min-width: 0;
+    }
+
+    .qr-box {
+      background: rgba(15, 23, 42, 0.03);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    #qrCanvas {
+      width: 200px;
+      height: 200px;
+      max-width: 100%;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .howto {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .howto.manual-only {
+      grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 720px) {
+      .howto {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .howto-card {
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: rgba(15, 23, 42, 0.03);
+      border-radius: 14px;
+      padding: 12px 12px;
+    }
+
+    .howto-card h3 {
+      margin: 0 0 6px;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+
+    .howto-card ol {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: #334155;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: #475569;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .setup-toggle {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .seg {
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: rgba(15, 23, 42, 0.03);
+      color: #0f172a;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .seg.active {
+      background: rgba(26, 95, 122, 0.12);
+      border-color: rgba(26, 95, 122, 0.3);
+      color: var(--primary-dark);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 420px) {
+      .actions .btn {
+        flex: 1 1 100%;
+        justify-content: center;
+      }
+    }
+
+    .field label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #0f172a;
+      font-size: 0.9rem;
+    }
+
+    .field input, .field textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(15, 23, 42, 0.14);
+      border-radius: 12px;
+      padding: 12px 12px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    /* Prevent long readonly values from forcing layout overflow */
+    .field input[readonly] {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      word-break: break-all;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    /* Override the default flex actions for the enroll button cluster */
+    .actions.enroll-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    @media (max-width: 520px) {
+      .actions.enroll-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.06);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background: rgba(220, 38, 38, 0.1);
+      color: #b91c1c;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      background: rgba(15, 23, 42, 0.03);
+      color: #0f172a;
+      display: none;
+      line-height: 1.45;
+    }
+
+    .message.show { display: block; }
+    .message.ok { background: rgba(4, 120, 87, 0.08); color: #065f46; border-color: rgba(4, 120, 87, 0.18); }
+    .message.error { background: rgba(220, 38, 38, 0.08); color: #991b1b; border-color: rgba(220, 38, 38, 0.18); }
+    .message.info { background: rgba(26, 95, 122, 0.08); color: #0b4f67; border-color: rgba(26, 95, 122, 0.18); }
+
+    .muted { color: #475569; font-size: 0.92rem; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="brand">
+        <i class="fa-solid fa-shield-halved"></i>
+        <h1>HYDRO Admin Security Setup</h1>
+      </div>
+      <div class="pill" id="accountPill"><i class="fa-solid fa-user"></i><span id="accountEmail">Loading...</span></div>
+    </div>
+
+    <div class="card-body">
+      <p class="lead">
+        MFA is optional. Enable an authenticator app (TOTP) for extra security on your account.
+      </p>
+
+      <div class="message" id="messageBox"></div>
+
+      <div class="section" id="verifySection">
+        <h2>1) Verify your email</h2>
+        <p class="muted" id="verifyStatus">Checking email verification...</p>
+        <div class="actions">
+          <button class="btn btn-secondary" type="button" id="sendVerifyBtn"><i class="fa-regular fa-paper-plane"></i>Send verification email</button>
+          <button class="btn btn-secondary" type="button" id="refreshVerifyBtn"><i class="fa-solid fa-rotate"></i>I've verified</button>
+        </div>
+      </div>
+
+      <div class="section hidden" id="enrollSection">
+        <h2>2) Enroll TOTP (Authenticator app)</h2>
+        <p class="muted">Scan the QR code (recommended) or add the secret key manually in your authenticator app.</p>
+
+        <div class="setup-toggle" role="tablist" aria-label="Setup method">
+          <button class="seg active" type="button" id="methodQrBtn" aria-selected="true"><i class="fa-solid fa-qrcode"></i>Scan QR</button>
+          <button class="seg" type="button" id="methodManualBtn" aria-selected="false"><i class="fa-solid fa-key"></i>Manual</button>
+        </div>
+
+        <div class="message info" id="manageBox" style="display:none;"></div>
+          <div class="actions" id="manageActions" style="display:none;">
+          <button class="btn btn-danger" type="button" id="resetMfaBtn"><i class="fa-solid fa-rotate-left"></i>Disable MFA</button>
+          <button class="btn btn-secondary" type="button" id="goBackBtn"><i class="fa-solid fa-arrow-left"></i>Go back</button>
+        </div>
+
+        <div class="enroll-layout">
+          <div id="qrPane">
+            <div class="qr-box">
+              <canvas id="qrCanvas" width="200" height="200"></canvas>
+            </div>
+            <div class="hint">If the QR is blank, click <b>Generate secret</b> first.</div>
+          </div>
+
+          <div>
+            <div class="grid">
+              <div class="field">
+                <label for="secretKey">Secret key</label>
+                <input id="secretKey" class="mono" type="text" readonly placeholder="Generate to display" />
+              </div>
+              <div class="field">
+                <label for="totpUri">TOTP URI</label>
+                <input id="totpUri" class="mono" type="text" readonly placeholder="Generate to display" />
+              </div>
+            </div>
+
+            <div class="actions enroll-actions">
+              <button class="btn btn-primary" type="button" id="generateBtn"><i class="fa-solid fa-key"></i>Generate secret</button>
+              <button class="btn btn-secondary" type="button" id="regenerateBtn"><i class="fa-solid fa-rotate"></i>Regenerate</button>
+              <button class="btn btn-secondary" type="button" id="copySecretBtn"><i class="fa-regular fa-copy"></i>Copy secret</button>
+              <button class="btn btn-secondary" type="button" id="copyUriBtn"><i class="fa-regular fa-copy"></i>Copy URI</button>
+            </div>
+
+            <div class="howto" id="howtoPane">
+              <div class="howto-card" id="howtoQrCard">
+                <h3>Scan QR (recommended)</h3>
+                <ol>
+                  <li>Open your authenticator app</li>
+                  <li>Choose <b>Add</b> / <b>Scan QR</b></li>
+                  <li>Scan the QR code shown on this page</li>
+                  <li>Enter the 6-digit code in step 3</li>
+                </ol>
+              </div>
+              <div class="howto-card" id="howtoManualCard">
+                <h3>Manual entry</h3>
+                <ol>
+                  <li>Choose <b>Enter a setup key</b> / <b>Manual</b></li>
+                  <li>Account/name: <b>your email</b></li>
+                  <li>Key: paste <b>Secret key</b> (copy button)</li>
+                  <li>Type: <b>Time-based</b> (TOTP)</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>3) Confirm code</h2>
+          <div class="grid">
+            <div class="field">
+              <label for="otp">6-digit code</label>
+              <input id="otp" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="8" />
+            </div>
+            <div class="field">
+              <label for="reauthPassword">Password (only if prompted)</label>
+              <input id="reauthPassword" type="password" autocomplete="current-password" placeholder="Enter your password" />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" type="button" id="enrollBtn"><i class="fa-solid fa-check"></i>Enable MFA</button>
+            <button class="btn btn-danger" type="button" id="signOutBtn"><i class="fa-solid fa-right-from-bracket"></i>Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/vendor/qr-creator/qr-creator.min.js?v=20260226"></script>
+  <script type="module" src="/js/admin-mfa-enroll.js"></script>
+</body>
+
+</html>

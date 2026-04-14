@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HYDRO - Bootstrap</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1e293b;
+      padding: 1rem;
+    }
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+      padding: 1.5rem;
+    }
+    .brand { text-align: center; margin-bottom: 1rem; }
+    .brand i { font-size: 2rem; color: var(--cyan); }
+    h1 { margin: 0.4rem 0 0.2rem; text-align: center; color: var(--primary-dark); }
+    p.sub { margin: 0 0 1rem; text-align: center; color: var(--gray); }
+    .message { display: none; border-radius: 8px; padding: 0.75rem; margin-bottom: 0.85rem; font-size: 0.9rem; }
+    .message.show { display: block; }
+    .message.error { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .message.ok { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .field { margin-bottom: 0.85rem; }
+    .field label { display: block; margin-bottom: 0.4rem; font-weight: 600; }
+    .field input {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      border: 0;
+      border-radius: 8px;
+      background: var(--primary-dark);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn i { margin-right: 0.45rem; }
+    .secondary {
+      background: #fff;
+      color: #1f2937;
+      border: 1px solid #cbd5e1;
+      margin-top: 0.65rem;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">
+      <i class="fa-solid fa-droplet"></i>
+      <h1>Bootstrap Super Admin</h1>
+      <p class="sub">First deployment initialization</p>
+    </div>
+
+    <div id="msg" class="message"></div>
+
+    <section id="signedOutSection">
+      <div class="field">
+        <label for="operatorEmail">Operator Email</label>
+        <input id="operatorEmail" type="email" placeholder="Enter operator email" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="operatorPassword">Operator Password</label>
+        <input id="operatorPassword" type="password" placeholder="Enter operator password" autocomplete="current-password" />
+      </div>
+      <button class="btn" id="signInBtn" type="button">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </button>
+    </section>
+
+    <section id="signedInSection" class="hidden">
+      <div class="field">
+        <label for="bootstrapKey">Bootstrap Key</label>
+        <input id="bootstrapKey" type="password" placeholder="Enter bootstrap key" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="confirmText">Type CONFIRM to proceed</label>
+        <input id="confirmText" type="text" placeholder="CONFIRM" autocomplete="off" />
+      </div>
+      <button class="btn" id="bootstrapBtn" type="button">Bootstrap Super Admin</button>
+      <button class="btn secondary" id="signOutBtn" type="button">Sign Out</button>
+    </section>
+  </main>
+
+  <script type="module" src="/js/bootstrap-init.js"></script>
+</body>
+</html>

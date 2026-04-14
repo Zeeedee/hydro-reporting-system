@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        document.documentElement.classList.add('hydro-auth-pending');
+    </script>
+    <style>
+        html.hydro-auth-pending body { opacity: 0 !important; }
+    </style>
+    <title>HYDRO Maintenance - Announcements</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/css/theme.css">
+
+        <link rel="stylesheet" href="/css/mobile-offcanvas.css">
+    <link rel="stylesheet" href="/css/nav-consistency.css">
+<style>
+* {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--light);
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 2rem;
+            color: var(--cyan);
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 3px solid var(--cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .header {
+            height: var(--header-height);
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+.page-content {
+            padding: 2rem;
+        }
+
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .announcement-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .announcement-header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .announcement-header.alert {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        }
+
+        .announcement-header.maintenance {
+            background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+        }
+
+        .announcement-header.general {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        }
+
+        .announcement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .announcement-icon.alert {
+            background: #dc2626;
+            color: white;
+        }
+
+        .announcement-icon.maintenance {
+            background: #0891b2;
+            color: white;
+        }
+
+        .announcement-icon.general {
+            background: #6366f1;
+            color: white;
+        }
+
+        .announcement-title {
+            flex: 1;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .announcement-body {
+            padding: 1.5rem;
+        }
+
+        .announcement-message {
+            color: var(--gray);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .announcement-meta {
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+            grid-column: 1/-1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .announcements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay" aria-hidden="true">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-droplet sidebar-logo"></i>
+            <div>
+                <div class="sidebar-title">HYDRO</div>
+                <div class="sidebar-subtitle">Maintenance Team</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="index.html" class="nav-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="tasks.html" class="nav-item"><i class="fas fa-tasks"></i> Tasks</a>
+            <a href="announcements.html" class="nav-item active"><i class="fas fa-bullhorn"></i> Announcements</a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-user-cog"></i> Profile Settings</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1 class="header-title">Announcements</h1>
+            <button class="btn-logout" id="logoutBtn" title="Log out"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+        </header>
+
+        <div class="page-content">
+            <div class="announcements-grid" id="announcementsGrid">
+                <!-- Announcements will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+      <script type="module" src="/js/ui/mobile-layout-init.js"></script>
+  <script type="module" src="/js/ui/activeNav.js"></script>
+<script type="module">
+        import { initMaintenanceAuthGuard, maintenanceLogout } from '../js/maintenance-auth.js';
+        import { getAnnouncementsList, markAnnouncementsSeen } from '../js/notifications.js';
+        import { formatTimestampManila } from '../js/timezone.js';
+        import { ROLES } from '../js/config/app-constants.js';
+        import { logError } from '../js/shared/logger.js';
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        async function init() {
+            try {
+                await initMaintenanceAuthGuard();
+                markAnnouncementsSeen().catch(() => {});
+                await loadAnnouncements();
+                document.getElementById('loadingOverlay').classList.add('hidden');
+            } catch (error) {
+                logError('Init error:', error);
+            }
+        }
+
+        async function loadAnnouncements() {
+            try {
+                const result = await getAnnouncementsList({ limit: 50, role: ROLES.MAINTENANCE });
+                if (!result.success) {
+                    const grid = document.getElementById('announcementsGrid');
+                    if (grid) {
+                        grid.innerHTML = `
+                            <div class="empty-state" style="color:#b91c1c;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>${escapeHtml(result.error || 'Unable to load announcements.')}</p>
+                                <button type="button" id="retryAnnouncementsBtn" style="margin-top:1rem; padding:0.7rem 1.1rem; border:none; border-radius:10px; background:var(--primary); color:#fff; font-weight:700; cursor:pointer;">Retry</button>
+                            </div>
+                        `;
+                        const retryBtn = document.getElementById('retryAnnouncementsBtn');
+                        if (retryBtn) {
+                            retryBtn.addEventListener('click', () => loadAnnouncements().catch(() => {}), { once: true });
+                        }
+                    }
+                    return;
+                }
+                renderAnnouncements(result.announcements);
+            } catch (error) {
+                logError('Error loading announcements:', error);
+                const grid = document.getElementById('announcementsGrid');
+                if (grid) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="color:#b91c1c;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Unable to load announcements right now.</p>
+                            <button type="button" id="retryAnnouncementsBtn" style="margin-top:1rem; padding:0.7rem 1.1rem; border:none; border-radius:10px; background:var(--primary); color:#fff; font-weight:700; cursor:pointer;">Retry</button>
+                        </div>
+                    `;
+                    const retryBtn = document.getElementById('retryAnnouncementsBtn');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', () => loadAnnouncements().catch(() => {}), { once: true });
+                    }
+                }
+            }
+        }
+
+        function renderAnnouncements(items) {
+            const grid = document.getElementById('announcementsGrid');
+
+            if (!items.length) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bullhorn"></i>
+                        <p>No announcements at this time</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map(a => {
+                const date = a.createdAt instanceof Date ? a.createdAt : (a.createdAt?.toDate?.() || new Date(a.createdAt?.seconds * 1000 || Date.now()));
+                const iconClass = a.type === 'alert' ? 'fa-bell' : a.type === 'maintenance' ? 'fa-wrench' : 'fa-info-circle';
+                const pinned = a.pinned ? '<span class="badge" style="margin-left:8px; font-size:0.75rem; padding:2px 8px; border-radius:999px; background:rgba(30,64,175,0.12); color:var(--primary);">Pinned</span>' : '';
+
+                return `
+                    <div class="announcement-card">
+                        <div class="announcement-header ${a.type || 'general'}">
+                            <div class="announcement-icon ${a.type || 'general'}">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div class="announcement-title">${escapeHtml(a.title || 'Announcement')}${pinned}</div>
+                        </div>
+                        <div class="announcement-body">
+                            <p class="announcement-message">${escapeHtml(a.message || '')}</p>
+                            <div class="announcement-meta">
+                                <span><i class="fas fa-clock"></i> ${formatTimestampManila(date, { hour: undefined, minute: undefined })}</span>
+                                <span><i class="fas fa-user"></i> Admin</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', maintenanceLogout);
+
+        init();
+    </script>
+</body>
+
+</html> 
+
+
+

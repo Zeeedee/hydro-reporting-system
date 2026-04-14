@@ -1,0 +1,449 @@
+:root {
+  --color-primary: #1e40af;
+  --color-secondary: #1e3a8a;
+  --color-accent: #3b82f6;
+  --color-bg: #f8fafc;
+  --color-card: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --radius-sm: 8px;
+  --radius-lg: 14px;
+  --shadow-card: 0 4px 10px rgba(15, 23, 42, 0.08);
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  --primary: var(--color-primary);
+  --primary-dark: var(--color-secondary);
+  --primary-light: var(--color-accent);
+  --secondary: var(--color-accent);
+  --light: var(--color-bg);
+  --gray: var(--text-secondary);
+  --gray-light: #e2e8f0;
+  --text: var(--text-primary);
+  --white: #ffffff;
+
+  --danger: #dc2626;
+  --success: #10b981;
+  --pending: #f59e0b;
+  --progress: var(--color-accent);
+  --resolved: #10b981;
+  --warning: #f59e0b;
+  --info: var(--color-accent);
+  --cyan: var(--color-accent);
+  --cyan-dark: #0e7490;
+  --yellow: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+
+  --shadow: var(--shadow-card);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.12);
+  --sidebar-width: 260px;
+  --header-height: 70px;
+}
+
+html {
+  font-size: 16px;
+  background: var(--color-bg);
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--text-primary);
+}
+
+html.hydro-auth-pending body {
+  opacity: 0;
+}
+
+html.hydro-auth-ready body {
+  opacity: 1;
+  transition: opacity 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.hydro-auth-ready body {
+    transition: none;
+  }
+}
+
+h1,
+h2,
+h3 {
+  color: var(--color-secondary);
+  font-weight: 700;
+}
+
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.card,
+.stat-card,
+.table-wrapper,
+.activity-card,
+.chart-card,
+.activity-section,
+.modal-card {
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+}
+
+.table-wrapper,
+.activity-card,
+.chart-card,
+.activity-section,
+.modal-card,
+.card {
+  background: var(--color-card);
+}
+
+.btn,
+.btn-primary,
+.btn-secondary {
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-secondary {
+  background: var(--gray-light);
+  color: var(--text-primary);
+}
+
+.submit-btn {
+  margin: 1.8rem 1.5rem;
+  background: #ffffff;
+  color: var(--color-primary);
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.sidebar-submit-btn {
+  margin: 0.9rem;
+  margin-top: 0.4rem;
+  padding: 0.9rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.2;
+  border-radius: 10px;
+  font-weight: 700;
+  justify-content: center;
+  text-align: center;
+  width: calc(100% - 1.8rem);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+}
+
+.btn-logout,
+.logout-btn {
+  margin-left: 0 !important;
+  cursor: pointer;
+  color: var(--gray) !important;
+  background: none !important;
+  border: none !important;
+  padding: 8px !important;
+  border-radius: 6px !important;
+  transition: all 0.15s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  min-width: auto !important;
+  line-height: 1 !important;
+}
+
+.btn-logout:hover,
+.logout-btn:hover {
+  color: var(--danger) !important;
+  background: #fef2f2 !important;
+}
+
+.btn-logout i,
+.logout-btn i {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.icon-btn,
+.btn-icon {
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.text-sm {
+  font-size: 0.9rem;
+}
+
+.text-xs {
+  font-size: 0.8rem;
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.text-danger {
+  color: var(--danger);
+}
+
+.text-info {
+  color: var(--info);
+}
+
+.submit-report-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 2100;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.submit-report-modal.active {
+  display: flex;
+  opacity: 1;
+}
+
+.submit-report-card {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
+  padding: 1.5rem;
+  transform: translateY(16px);
+  transition: transform 0.2s ease;
+}
+
+.submit-report-modal.active .submit-report-card {
+  transform: translateY(0);
+}
+
+.submit-report-header {
+  margin-bottom: 1rem;
+}
+
+.submit-report-title {
+  font-size: 1.3rem;
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.submit-report-subtitle {
+  color: var(--gray);
+  font-size: 0.92rem;
+}
+
+.submit-report-modal .form-group {
+  margin-bottom: 1rem;
+}
+
+.submit-report-modal .form-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.submit-report-modal .form-select,
+.submit-report-modal .form-input,
+.submit-report-modal .form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  background: #f8fafc;
+  transition: border-color 0.15s;
+}
+
+.submit-report-modal .form-select:focus,
+.submit-report-modal .form-input:focus,
+.submit-report-modal .form-textarea:focus {
+  border-color: var(--primary);
+  background: #ffffff;
+}
+
+.submit-report-modal .form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.submit-report-modal .file-input-wrapper {
+  position: relative;
+}
+
+.submit-report-modal .file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.submit-report-modal .btn-file {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--gray);
+  padding: 0.55rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.submit-report-modal .btn-file:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.submit-report-modal .file-name {
+  margin-left: 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.submit-report-modal .risk-options {
+  display: flex;
+  gap: 14px;
+  margin-top: 0.45rem;
+}
+
+.submit-report-modal .risk-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.submit-report-modal .risk-radio {
+  accent-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.submit-report-modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+.submit-report-modal .error-message,
+.submit-report-modal .success-message {
+  padding: 0.7rem 0.95rem;
+  border-radius: 8px;
+  margin-bottom: 0.9rem;
+  font-size: 0.88rem;
+  display: none;
+}
+
+.submit-report-modal .error-message {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+}
+
+.submit-report-modal .success-message {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.submit-report-modal .error-message.show,
+.submit-report-modal .success-message.show {
+  display: block;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: hydro-spin 0.8s linear infinite;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .form-input {
+  padding-right: 2.6rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--gray);
+  cursor: pointer;
+  padding: 6px;
+}
+
+.password-toggle:hover {
+  color: var(--primary);
+}
+
+@keyframes hydro-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar-submit-btn {
+    font-size: 0.82rem;
+    padding: 0.75rem 0.75rem;
+  }
+}
